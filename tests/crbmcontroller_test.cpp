@@ -22,7 +22,23 @@ void crbmcontrollerTest::testUpdate()
   int nrOfSensors     = 10;
   int nrOfActuators   = 20;
   int nrOfHiddenUnits = 5;
+
   CRBMController* crbm = new CRBMController(bins, nrOfSensors, nrOfActuators, nrOfHiddenUnits);
+
+  double sensors[nrOfSensors];
+  double actuators[nrOfActuators];
+  double actuators2[nrOfActuators];
+
+  for(int i = 0; i < nrOfSensors; i++)
+  {
+    sensors[i] = 2.0 * Random::unit() - 1.0;
+  }
+
+  for(int i = 0; i < nrOfActuators; i++)
+  {
+    actuators[i]  = 2.0 * Random::unit() - 1.0;
+    actuators2[i] = actuators[1];
+  }
 
   int n = ((int)ceil(log2(bins)) * nrOfSensors);
   int k = ((int)ceil(log2(bins)) * nrOfActuators);
@@ -64,5 +80,13 @@ void crbmcontrollerTest::testUpdate()
   crbm->setb(b);
   crbm->setc(c);
 
+  for(int i = 0; i < 100; i++)
+  {
+    crbm->update(sensors, actuators);
+    for(int j = 0; j < nrOfActuators; j++)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, fabs(actuators[i] - actuators2[i]), 0.00000001);
+    }
+  }
 }
 
