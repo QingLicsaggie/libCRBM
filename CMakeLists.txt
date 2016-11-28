@@ -45,7 +45,8 @@ INSTALL(DIRECTORY ${CMAKE_SOURCE_DIR}/src/entropy++/
   PATTERN "*.txt" EXCLUDE
   )
 
-option(LIBCRBM_TESTS "Compile test cases" OFF)
+option(LIBCRBM_TESTS   "Compile test cases" OFF)
+option(LIBCRBM_VERBOSE "Verbose mode"       OFF)
 
 if(LIBCRBM_TESTS)
   add_subdirectory(tests)

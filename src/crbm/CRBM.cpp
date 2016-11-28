@@ -1,5 +1,6 @@
 #include <crbm/CRBM.h>
 #include <crbm/Random.h>
+#include <glog/logging.h>
 
 #include <math.h>
 

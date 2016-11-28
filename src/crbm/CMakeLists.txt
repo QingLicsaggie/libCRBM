@@ -4,7 +4,9 @@ link_directories(${PROJECT_BINARY_DIR}/lib)
 set(SRC
   RBM.cpp
   CRBM.cpp
+  CRBMController.cpp
   Random.cpp
+  Discretiser.cpp
 )
 
 if(APPLE)
@@ -14,5 +16,4 @@ else(APPLE)
   add_library(CRBM STATIC ${SRC})
 endif(APPLE)
 
-target_link_libraries(CRBM ${Boost_LIBRARIES} Matrix)
-
+target_link_libraries(CRBM ${Boost_LIBRARIES} Matrix m)
