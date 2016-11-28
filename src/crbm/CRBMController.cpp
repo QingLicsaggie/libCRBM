@@ -19,9 +19,8 @@ CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int
 
   _d               = new Discretiser(bins, -1.0, 1.0);
 
-  _binaryInput.resize(1,  _nrOfSensors   * _unitPerSenAct);
+  _binaryInput.resize(1, _nrOfSensors    * _unitPerSenAct);
   _binaryOutput.resize(1, _nrOfActuators * _unitPerSenAct);
-
 }
 
 CRBMController::~CRBMController()
@@ -39,7 +38,7 @@ void CRBMController::update(double* sensors, double* actuators)
     _d->double2doublearray(sensors[i], _tmpInput);
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _binaryInput(0,index++) = _tmpInput[j];
+      _binaryInput(0, index++) = _tmpInput[j];
     }
   }
 
@@ -50,7 +49,7 @@ void CRBMController::update(double* sensors, double* actuators)
   {
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _tmpOutput[j] = _binaryOutput(0,index++);
+      _tmpOutput[j] = _binaryOutput(0, index++);
     }
     actuators[i] = _d->doublearray2double(_tmpOutput);
   }
