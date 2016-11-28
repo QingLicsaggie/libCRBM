@@ -16,6 +16,10 @@ namespace libcrbm
       uint64_t map(double value);
 
       void binarise(uint64_t value, double* values); // 3 -> 0011, 8 -> 1000
+      double unbinarise(double* values);             // 0011 -> 3, 1000 -> 8
+
+      void   double2doublearray(double value, double *values);
+      double doublearray2double(double *values);
 
       friend std::ostream& operator<<(std::ostream& str, const Discretiser& d)
       {

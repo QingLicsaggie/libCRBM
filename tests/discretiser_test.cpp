@@ -492,3 +492,45 @@ void discretiserTest::testBinVetorOfValue()
 
   delete d;
 }
+
+void discretiserTest::testUnBinVetorOfValue()
+{
+  Discretiser *d = new Discretiser(8, -1.0, 1.0);
+  double* values = new double[3];
+  double v       = -1.0;
+
+
+  values[0] = 0.0; values[1] = 0.0; values[2] = 0.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v, 0.00001);
+
+  values[0] = 1.0; values[1] = 0.0; values[2] = 0.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v, 0.00001);
+
+  values[0] = 0.0; values[1] = 1.0; values[2] = 0.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, v, 0.00001);
+
+  values[0] = 1.0; values[1] = 1.0; values[2] = 0.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, v, 0.00001);
+
+  values[0] = 0.0; values[1] = 0.0; values[2] = 1.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, v, 0.00001);
+
+  values[0] = 1.0; values[1] = 0.0; values[2] = 1.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, v, 0.00001);
+
+  values[0] = 0.0; values[1] = 1.0; values[2] = 1.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(6.0, v, 0.00001);
+
+  values[0] = 1.0; values[1] = 1.0; values[2] = 1.0;
+  v = d->unbinarise(values);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(7.0, v, 0.00001);
+
+  delete d;
+}

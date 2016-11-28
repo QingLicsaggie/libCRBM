@@ -15,10 +15,7 @@ Discretiser::Discretiser(int numberOfBins, double d_min, double d_max)
   _max          = d_max;
   _domain       = d_max - d_min;
   _factor       = _domain / ((double)numberOfBins);
-
-  double d = log2(_numberOfBins);
-  _n = (int)d;
-  if(fabs(d - log2(_numberOfBins)) > 0.00001) _n++;
+  _n            = (int)ceil(log2(_numberOfBins));
 }
 
 
@@ -36,10 +33,9 @@ double Discretiser::unmap(uint64_t value)
 
 void Discretiser::binarise(uint64_t value, double* values)
 {
-  int v = 1;
   for(int i = 0; i < _n; i++)
   {
-    if(((v << i) & value) > 0)
+    if(((1 << i) & value) > 0)
     {
       values[i] = 1.0;
     }
@@ -49,3 +45,21 @@ void Discretiser::binarise(uint64_t value, double* values)
     }
   }
 } 
+
+double Discretiser::unbinarise(double* values)
+{
+  double v = 0.0;
+  for(int i = 0; i < _n; i++) if(values[i] > 0) v += (1 << i);
+  return v;
+}
+
+void Discretiser::double2doublearray(double value, double *values)
+{
+  binarise(map(value), values);
+}
+
+double Discretiser::doublearray2double(double *values)
+{
+  return unmap(unbinarise(values));
+}
+
