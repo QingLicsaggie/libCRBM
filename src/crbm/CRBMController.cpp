@@ -39,7 +39,7 @@ void CRBMController::update(double* sensors, double* actuators)
     _d->double2doublearray(sensors[i], _tmpInput);
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _binaryInput(1,index++) = _tmpInput[j];
+      _binaryInput(0,index++) = _tmpInput[j];
     }
   }
 
@@ -50,7 +50,7 @@ void CRBMController::update(double* sensors, double* actuators)
   {
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _tmpOutput[j] = _binaryOutput(1,index++);
+      _tmpOutput[j] = _binaryOutput(0,index++);
     }
     actuators[i] = _d->doublearray2double(_tmpOutput);
   }
