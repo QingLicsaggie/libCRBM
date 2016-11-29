@@ -62,7 +62,7 @@ void rbmTest::testRandomInit()
 
   rbm->initRandomWeights();
   rbm->initHiddenBiasValues();
-  rbm->initOutputBiasValues();
+  rbm->initInputBiasValues();
 
   double sum = 0.0;
   for(int a = 0; a < m; a++)

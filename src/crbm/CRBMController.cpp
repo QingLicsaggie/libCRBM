@@ -5,8 +5,11 @@
 #include <math.h>
 
 CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int nrOfHiddenUnits)
-  : _binaryInput(1,1), _binaryOutput(1,1),
-  CRBM((int)ceil(log2(bins)) * nrOfSensors, (int)ceil(log2(bins)) * nrOfActuators, nrOfHiddenUnits)
+  : _binaryInput(1,1),
+    _binaryOutput(1,1),
+    CRBM((int)ceil(log2(bins)) * nrOfSensors,
+         nrOfHiddenUnits,
+         (int)ceil(log2(bins)) * nrOfActuators)
 {
   _bins            = bins;
   _nrOfSensors     = nrOfSensors;
@@ -19,8 +22,10 @@ CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int
 
   _d               = new Discretiser(bins, -1.0, 1.0);
 
-  _binaryInput.resize(1, _nrOfSensors    * _unitPerSenAct);
-  _binaryOutput.resize(1, _nrOfActuators * _unitPerSenAct);
+  _binaryInput.resize(_nrOfSensors    * _unitPerSenAct, 1);
+  _binaryOutput.resize(_nrOfActuators * _unitPerSenAct, 1);
+
+  // : RBM(n, m, k), _x(n,1), _y(m,1), _z(1,k)
 }
 
 CRBMController::~CRBMController()
@@ -38,7 +43,7 @@ void CRBMController::update(double* sensors, double* actuators)
     _d->double2doublearray(sensors[i], _tmpInput);
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _binaryInput(0, index++) = _tmpInput[j];
+      _binaryInput(index++,0) = _tmpInput[j];
     }
   }
 
@@ -49,7 +54,7 @@ void CRBMController::update(double* sensors, double* actuators)
   {
     for(int j = 0; j < _unitPerSenAct; j++)
     {
-      _tmpOutput[j] = _binaryOutput(0, index++);
+      _tmpOutput[j] = _binaryOutput(index++,0);
     }
     actuators[i] = _d->doublearray2double(_tmpOutput);
   }

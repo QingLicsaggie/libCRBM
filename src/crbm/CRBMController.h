@@ -19,7 +19,10 @@ namespace libcrbm
     class CRBMController : public CRBM
     {
       public:
-        CRBMController(int bins, int nrOfSensors, int nrOfActuators, int nrOfHiddenUnits);
+        CRBMController(int bins,
+                       int nrOfSensors,
+                       int nrOfActuators,
+                       int nrOfHiddenUnits);
         ~CRBMController();
 
         void update(double* sensors, double* actuators);

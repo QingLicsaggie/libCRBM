@@ -10,7 +10,7 @@ using namespace libcrbm;
 using namespace libcrbm::binary;
 
 CRBM::CRBM(int n, int m, int k)
-  : RBM(n, m, k), _x(n,1), _y(1,m), _z(1,k)
+  : RBM(n, m, k), _x(n,1), _y(k,1), _z(1,m)
 {
   Random::initialise();
 }
@@ -40,41 +40,38 @@ void CRBM::control(Matrix& y, Matrix& x)
   __down(_z);
 }
 
-
-void CRBM::__up(Matrix& y, Matrix& x)
+void CRBM::__up(Matrix& x, Matrix& y)
 {
-  // cout << "c: " << endl << _c << endl;
-  // cout << "b: " << endl << _b << endl;
-  cout << "W: " << endl << _W << endl;
-  // cout << "V: " << endl << _V << endl;
-  cout << "x: " << endl << _x << endl;
-  // cout << "y: " << endl << _y << endl;
-  // cout << "z: " << endl << _z << endl;
+  // cout << "V:" << _V << endl;
+  // cout << "W:" << _W << endl;
+  // cout << "b:" << _b << endl;
+  // cout << "c:" << _c << endl;
+  // cout << "x:" <<  x << endl;
+  // cout << "y:" <<  y << endl;
+  // cout << "z:" << _z << endl;
 
-  cout << "hier 10 1" << endl;
-  _W * _x;
-  cout << "hier 10 2" << endl;
-  // _V * _y;
-  // cout << "hier 10 3" << endl;
+  _W * x;
 
-  // _z = _c + _y * _V + _z * _W;
-
-  // cout << "hier 10" << endl;
-  // for(int i = 0; i < _k; i++)
-  // {
-    // _z(0, i) = (Random::unit() > _z(0, i))?1.0:0.0;
-  // }
-  // cout << "hier 11" << endl;
+  _z = _c + _V * y + _W * x;
+  for(int i = 0; i < _m; i++)
+  {
+    _z(i,0) = sigm(_z(i,0));
+  }
+  for(int i = 0; i < _m; i++)
+  {
+    _z(i,0) = (Random::unit() > _z(i,0))?1.0:0.0;
+  }
 }
 
 void CRBM::__down(Matrix& z)
 {
-  cout << "hier 12" << endl;
-  _x = _b + _z * _W;
-  cout << "hier 13" << endl;
+  _x = _b + _Wt * z;
+  for(int i = 0; i < _n; i++)
+  {
+    _x(i, 0) = sigm(_x(i,0));
+  }
   for(int i = 0; i < _n; i++)
   {
     _x(i, 0) = (Random::unit() > _x(i, 0))?1.0:0.0;
   }
-  cout << "hier 14" << endl;
 }

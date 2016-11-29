@@ -15,8 +15,8 @@ namespace libcrbm
         CRBM(int n, int m, int k);
         ~CRBM();
 
-        void learn(Matrix& y, Matrix& x);
-        void control(Matrix& y, Matrix& x);
+        void learn(Matrix& x, Matrix& y);
+        void control(Matrix& x, Matrix& y);
 
       private:
 

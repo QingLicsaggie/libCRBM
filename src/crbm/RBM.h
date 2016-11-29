@@ -16,8 +16,8 @@ namespace libcrbm
       //RBM operator=(const RBM);
 
       void initRandomWeights(double w = 0.01);
-      void initHiddenBiasValues(double b = 0.01);
-      void initOutputBiasValues(double c = 0.01);
+      void initInputBiasValues(double b = 0.01);
+      void initHiddenBiasValues(double c = 0.01);
 
       int n() {return _n;};
       int m() {return _m;};
@@ -28,10 +28,10 @@ namespace libcrbm
       double b(int i)        {return _b(i,0);};
       double c(int i)        {return _c(i,0);};
 
-      void setW(Matrix W) {_W = W;};
-      void setV(Matrix V) {_V = V;};
-      void setb(Matrix b) {_b = b;};
-      void setc(Matrix c) {_c = c;};
+      void setW(Matrix W);
+      void setV(Matrix V);
+      void setb(Matrix b);
+      void setc(Matrix c);
 
     protected:
 
@@ -49,6 +49,7 @@ namespace libcrbm
       int    _batchsize;    // size of training data batches
 
       Matrix _W;            // interaction weights between hidden and outputs
+      Matrix _Wt;           // transposed W
       Matrix _V;            // interaction weights between hidden and inputs
       Matrix _b;            // bias values for output
       Matrix _c;            // bias values for hidden
