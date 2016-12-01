@@ -10,28 +10,21 @@ CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int
   _bins            = bins;
   _nrOfSensors     = nrOfSensors;
   _nrOfActuators   = nrOfActuators;
-
-  _unitsPerSenAct   = (int)ceil(log2(bins));
-
-  _tmpInput        = new double[_unitsPerSenAct];
-  _tmpOutput       = new double[_unitsPerSenAct];
+  _unitsPerSenAct  = (int)ceil(log2(bins));
 
   _d               = new Discretiser(bins, -1.0, 1.0);
 
   _y.resize(_nrOfSensors   * _unitsPerSenAct, 1);
   _x.resize(_nrOfActuators * _unitsPerSenAct, 1);
 
-  cout << "CRBMController: _unitsPerSenAct: "    << _unitsPerSenAct << endl;
-  cout << "CRBMController: nr of sensors: "      << _nrOfSensors    << endl;
-  cout << "CRBMController: nr of sensor nodes: " << _nrOfSensors * _unitsPerSenAct << endl;
-
   _crbm = new CRBM(_unitsPerSenAct * nrOfSensors,     // k
                    nrOfHiddenUnits,                   // m
                    _unitsPerSenAct * nrOfActuators,   // n
                    u);
 
-
   // : RBM(n, m, k), _x(n,1), _y(m,1), _z(1,k)
+  _tmpInput        = new double[_unitsPerSenAct];
+  _tmpOutput       = new double[_unitsPerSenAct];
 }
 
 CRBMController::~CRBMController()
