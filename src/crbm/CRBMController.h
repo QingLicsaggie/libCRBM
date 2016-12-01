@@ -33,21 +33,21 @@ namespace libcrbm
 
       private:
 
-        int          _bins;
-        int          _nrOfSensors;
-        int          _nrOfActuators;
+        int     _bins;
+        int     _nrOfSensors;
+        int     _nrOfActuators;
 
-        int          _nrOfInputUnits;
-        int          _nrOfHiddenUnits;
-        int          _nrOfOutputUnits;
+        int     _nrOfInputUnits;
+        int     _nrOfHiddenUnits;
+        int     _nrOfOutputUnits;
 
-        Matrix       _y;
-        Matrix       _x;
+        Matrix  _y;
+        Matrix  _x;
 
-        double*      _tmpInput;
-        double*      _tmpOutput;
+        double* _tmpInput;
+        double* _tmpOutput;
 
-        int          _unitPerSenAct; // nr of unit for each sensor and actuator
+        int     _unitPerSenAct; // nr of unit for each sensor and actuator
 
         Discretiser* _d;
     };

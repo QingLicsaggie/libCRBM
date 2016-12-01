@@ -437,54 +437,54 @@ void discretiserTest::testBinVetorOfValue()
   double* v = new double[3];
 
 
-  d->binarise(0, v);
+  d->binarise(0, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[2], 0.000001);
 
 
-  d->binarise(1, v);
+  d->binarise(1, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[2], 0.000001);
 
 
-  d->binarise(2, v);
+  d->binarise(2, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[2], 0.000001);
 
 
-  d->binarise(3, v);
+  d->binarise(3, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[2], 0.000001);
 
 
-  d->binarise(4, v);
+  d->binarise(4, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[2], 0.000001);
 
 
-  d->binarise(5, v);
+  d->binarise(5, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[2], 0.000001);
 
-  d->binarise(6, v);
+  d->binarise(6, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[1], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[2], 0.000001);
 
-  d->binarise(7, v);
+  d->binarise(7, v, 3);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[0], 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v[1], 0.000001);
@@ -499,37 +499,36 @@ void discretiserTest::testUnBinVetorOfValue()
   double* values = new double[3];
   double v       = -1.0;
 
-
   values[0] = 0.0; values[1] = 0.0; values[2] = 0.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, v, 0.00001);
 
   values[0] = 1.0; values[1] = 0.0; values[2] = 0.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, v, 0.00001);
 
   values[0] = 0.0; values[1] = 1.0; values[2] = 0.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, v, 0.00001);
 
   values[0] = 1.0; values[1] = 1.0; values[2] = 0.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, v, 0.00001);
 
   values[0] = 0.0; values[1] = 0.0; values[2] = 1.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, v, 0.00001);
 
   values[0] = 1.0; values[1] = 0.0; values[2] = 1.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, v, 0.00001);
 
   values[0] = 0.0; values[1] = 1.0; values[2] = 1.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(6.0, v, 0.00001);
 
   values[0] = 1.0; values[1] = 1.0; values[2] = 1.0;
-  v = d->unbinarise(values);
+  v = d->unbinarise(values, 3);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(7.0, v, 0.00001);
 
   delete d;

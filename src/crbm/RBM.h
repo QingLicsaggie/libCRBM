@@ -28,10 +28,10 @@ namespace libcrbm
       double b(int i)        {return _b(i,0);};
       double c(int i)        {return _c(i,0);};
 
-      void setW(Matrix W);
-      void setV(Matrix V);
-      void setb(Matrix b);
-      void setc(Matrix c);
+      void setW(Matrix& W);
+      void setV(Matrix& V);
+      void setb(Matrix& b);
+      void setc(Matrix& c);
 
     protected:
 

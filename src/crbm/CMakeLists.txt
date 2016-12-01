@@ -17,4 +17,7 @@ else(APPLE)
   add_library(CRBM STATIC ${SRC})
 endif(APPLE)
 
-target_link_libraries(CRBM ${Boost_LIBRARIES} Matrix m)
+target_link_libraries(CRBM ${Boost_LIBRARIES} Matrix m Entropy++ glog)
+
+add_executable(train main_train.cpp)
+target_link_libraries(train CRBM gflags)

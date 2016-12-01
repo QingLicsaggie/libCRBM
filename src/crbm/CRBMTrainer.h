@@ -2,7 +2,6 @@
 #define __CRBM_TRAINER_H__
 
 #include <matrix/Matrix.h>
-#include <crbm/Discretiser.h>
 #include <crbm/CRBM.h>
 
 #include <stdint.h>
@@ -16,58 +15,46 @@ namespace libcrbm
 {
   namespace binary
   {
-    class CRBMTrainer : public CRBM
+    class CRBMTrainer
     {
       public:
-        CRBMTrainer(int bins,
-                    int nrOfSensors,
-                    int nrOfActuators,
-                    int nrOfHiddenUnits,
-                    int uditerations);
+        CRBMTrainer(int    bins,
+                    int    uditerations,
+                    int    numepochs,
+                    int    batchsize,
+                    double alpha,
+                    double momentum,
+                    double weightcost,
+                    double pertubation);
+
         ~CRBMTrainer();
 
-        void setInputTrainingData(Matrix& input);
-        void setOutputTrainingData(Matrix& output);
-
-        void train();
-
-        //CRBMTrainer(const CRBMTrainer);
-        //CRBMTrainer operator=(const CRBMTrainer);
+        void train(string inputFilename, string outputFilename, int m);
 
       private:
-        void         __initialiseb();
+        int    _bins;
+        int    _batchsize;     // size of training data batches
+        int    _numepochs;     // number of training epochs
+        int    _unitPerSenAct; // nr of unit for each sensor and actuator
+        int    _uditerations;  // nr of up-down iterations
+        double _alpha;         // learning rate
+        double _momentum;      // contribution of the previous gradient
+        double _pertubation;   // add randomness to the data
+        double _weightcost;    // weight cost for L2
 
-        Matrix       _input;
-        Matrix       _output;
+        int    _nrOfSensors;
+        int    _nrOfActuators;
 
-        int          _bins;
-        int          _nrOfSensors;
-        int          _nrOfActuators;
+        int    _nrOfInputUnits;
+        int    _nrOfHiddenUnits;
+        int    _nrOfOutputUnits;
 
-        int          _nrOfInputUnits;
-        int          _nrOfHiddenUnits;
-        int          _nrOfOutputUnits;
+        Matrix _vW;            // for the momentum
+        Matrix _vV;            // for the momentum
+        Matrix _vb;            // for the momentum
+        Matrix _vc;            // for the momentum
 
-        Matrix       _binaryInput;
-        Matrix       _binaryOutput;
-
-        double*      _tmpInput;
-        double*      _tmpOutput;
-
-        int          _unitPerSenAct; // nr of unit for each sensor and actuator
-
-        Discretiser* _d;
-
-        double       _alpha;         // learning rate
-        double       _momentum;      // contribution of the previous gradient
-        double       _weightcost;    // weight cost for L2
-        double       _pertubation;   // add randomness to the data
-        int          _numepochs;     // number of training epochs
-        int          _batchsize;     // size of training data batches
-        Matrix       _vW;            // for the momentum
-        Matrix       _vV;            // for the momentum
-        Matrix       _vb;            // for the momentum
-        Matrix       _vc;            // for the momentum
+        CRBM*  _crbm;
 
     };
   }

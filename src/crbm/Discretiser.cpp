@@ -31,9 +31,9 @@ double Discretiser::unmap(uint64_t value)
   return _min + 0.5 * _factor + ((double)value) * _factor;
 }
 
-void Discretiser::binarise(uint64_t value, double* values)
+void Discretiser::binarise(uint64_t value, double* values, int n)
 {
-  for(int i = 0; i < _n; i++)
+  for(int i = 0; i < n; i++)
   {
     if(((1 << i) & value) > 0)
     {
@@ -46,20 +46,20 @@ void Discretiser::binarise(uint64_t value, double* values)
   }
 } 
 
-double Discretiser::unbinarise(double* values)
+double Discretiser::unbinarise(double* values, int n)
 {
   double v = 0.0;
-  for(int i = 0; i < _n; i++) if(values[i] > 0) v += (1 << i);
+  for(int i = 0; i < n; i++) if(values[i] > 0) v += (1 << i);
   return v;
 }
 
 void Discretiser::double2doublearray(double value, double *values)
 {
-  binarise(map(value), values);
+  binarise(map(value), values, _n);
 }
 
 double Discretiser::doublearray2double(double *values)
 {
-  return unmap(unbinarise(values));
+  return unmap(unbinarise(values, _n));
 }
 

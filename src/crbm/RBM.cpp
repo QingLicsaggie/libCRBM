@@ -64,24 +64,24 @@ double RBM::sigm(double v)
   return 1.0 / (1.0 + exp(-v));
 }
 
-void RBM::setW(Matrix W)
+void RBM::setW(Matrix& W)
 {
   _W  = W;
   _Wt = W;
   _Wt.transpose();
 }
 
-void RBM::setV(Matrix V)
+void RBM::setV(Matrix& V)
 {
   _V = V;
 }
 
-void RBM::setb(Matrix b)
+void RBM::setb(Matrix& b)
 {
   _b = b;
 }
 
-void RBM::setc(Matrix c)
+void RBM::setc(Matrix& c)
 {
   _c = c;
 }
