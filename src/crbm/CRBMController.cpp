@@ -22,7 +22,6 @@ CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int
                    _unitsPerSenAct * nrOfActuators,   // n
                    u);
 
-  // : RBM(n, m, k), _x(n,1), _y(m,1), _z(1,k)
   _tmpInput        = new double[_unitsPerSenAct];
   _tmpOutput       = new double[_unitsPerSenAct];
 }

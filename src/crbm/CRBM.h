@@ -41,10 +41,11 @@ namespace libcrbm
         const Matrix& x() { return _x; }
         const Matrix& y() { return _y; }
         const Matrix& z() { return _z; }
+        void  initLearning(int n);
 
       private:
 
-        double sigm(double v);
+        double __sigm(double v);
 
         int    _n;            // number of output units
         int    _m;            // number of hidden units
@@ -61,6 +62,7 @@ namespace libcrbm
         Matrix _y;            // hidden
         Matrix _z;            // output
 
+        bool _learningInitialised;
 
     };
   }

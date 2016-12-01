@@ -158,8 +158,10 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
   VLOG(40) << "S Matrix" << endl << S;
   VLOG(40) << "A Matrix" << endl << A;
 
-  Matrix SBatch(_batchsize, S.cols());
-  Matrix ABatch(_batchsize, A.cols());
+  Matrix SBatch(S.cols(), _batchsize);
+  Matrix ABatch(A.cols(), _batchsize);
+
+  _crbm->initLearning(_batchsize);
 
   // Let the training begin
   VLOG(10) << "Training begins, with " << _numepochs << " epochs and batch size of " << _batchsize;
@@ -179,7 +181,7 @@ void CRBMTrainer::__copy(Matrix& dst, const Matrix& src, int index)
   {
     for(int c = 0; c < dst.cols(); c++)
     {
-      dst(r,c) = src(index + r, c);
+      dst(r,c) = src(index + c, r);
     }
   }
 }

@@ -15,18 +15,46 @@ using namespace libcrbm::binary;
 // n - output
 
 CRBM::CRBM(int k, int m, int n, int u)
-  :  _W(m,n), _V(m,k), _b(n,1), _c(m,1), _Wt(n,m), _x(n,1), _y(k,1), _z(m,1)
+  :  _W(m,n),  _V(m,k), _b(n,1), _c(m,1),
+     _Wt(n,m), _x(n,1), _y(k,1), _z(m,1)
 {
-  _k            = k;
-  _m            = m;
-  _n            = n;
-  _uditerations = u;
+  _k                   = k;
+  _m                   = m;
+  _n                   = n;
+  _uditerations        = u;
+  _learningInitialised = false;
 
   Random::initialise();
 }
 
 CRBM::~CRBM()
 {
+}
+
+void CRBM::initLearning(int n)
+{
+  Matrix ctmp(_c.rows(), n);
+  Matrix btmp(_b.rows(), n);
+
+  for(int r = 0; r < btmp.rows(); r++)
+  {
+    for(int c = 0; c < n; c++)
+    {
+      btmp(r,c) = _b(r,0);
+    }
+  }
+
+  for(int r = 0; r < ctmp.rows(); r++)
+  {
+    for(int c = 0; c < n; c++)
+    {
+      ctmp(r,c) = _c(r,0);
+    }
+  }
+
+  _b = btmp;
+  _c = ctmp;
+
 }
 
 void CRBM::learn(Matrix& y, Matrix& x)
@@ -68,7 +96,7 @@ void CRBM::up(Matrix& y, Matrix& x)
   _z = _c + _V * y + _W * x;
   for(int i = 0; i < _m; i++)
   {
-    _z(i,0) = sigm(_z(i,0));
+    _z(i,0) = __sigm(_z(i,0));
   }
   for(int i = 0; i < _m; i++)
   {
@@ -84,7 +112,7 @@ void CRBM::down(Matrix& z)
   _x = _b + _Wt * z;
   for(int i = 0; i < _n; i++)
   {
-    _x(i, 0) = sigm(_x(i,0));
+    _x(i, 0) = __sigm(_x(i,0));
   }
   for(int i = 0; i < _n; i++)
   {
@@ -137,7 +165,7 @@ void CRBM::initHiddenBiasValues(double c)
 
 }
 
-double CRBM::sigm(double v)
+double CRBM::__sigm(double v)
 {
   return 1.0 / (1.0 + exp(-v));
 }
