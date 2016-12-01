@@ -2,6 +2,8 @@
 #include <crbm/Discretiser.h>
 #include <crbm/Discretiser.h>
 #include <crbm/Random.h>
+#include <crbm/ext/progressbar.h>
+#include <crbm/CRBMIO.h>
 
 #include <entropy++/Csv.h>
 #include <entropy++/Container.h>
@@ -28,13 +30,14 @@ CRBMTrainer::CRBMTrainer(int    bins,
   _weightcost    = weightcost;
   _pertubation   = pertubation;
   _unitPerSenAct = (int)ceil(log2(_bins));
+  _usePB         = true;
 }
 
 CRBMTrainer::~CRBMTrainer()
 {
 }
 
-void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
+void CRBMTrainer::train(string inputFilename, string outputFilename, string out, int m)
 {
   VLOG(10) << "reading S-file: " << inputFilename;
   entropy::DContainer* input  = entropy::Csv::read(inputFilename);
@@ -179,23 +182,35 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
   _vW.resize(m,n);
   _vV.resize(m,k);
 
+  progressbar *progress;
+  if(_usePB) progress = progressbar_new("Training", _numepochs);
+
   // Let the training begin
   VLOG(10) << "Training begins, with " << _numepochs << " epochs and batch size of " << _batchsize;
   for(int i = 0; i < _numepochs; i++)
   {
-    cout << i << endl;
+    VLOG(10) << "Epoch " << i;
     int dataStartIndex = Random::rand(0, length - _batchsize);
+    VLOG(10) << "Start index " << dataStartIndex;
     __copy(SBatch, S, dataStartIndex);
+    VLOG(30) << SBatch;
     __copy(ABatch, A, dataStartIndex);
+    VLOG(30) << ABatch;
     __randomAInit(AInit);
+    VLOG(30) << AInit;
 
     _crbm->up(SBatch, ABatch);
     Matrix z1 = _crbm->z();
+    VLOG(30) << "Z1:";
+    VLOG(30) << z1;
     // cout << "z1:" << endl << z1 << endl;
     _crbm->learn(SBatch, AInit);
     Matrix z2 = _crbm->z();
+    VLOG(30) << "Z2:";
+    VLOG(30) << z2;
     Matrix Agenerated = _crbm->x();
-    // cout << "z2:" << endl << z2 << endl;
+    VLOG(30) << "A generated:";
+    VLOG(30) << Agenerated;
 
     for(int c = 0; c < _batchsize; c++)
     {
@@ -206,6 +221,8 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
       }
     }
     Eb /= (double)_batchsize;
+    VLOG(30) << "E[b]:";
+    VLOG(30) << Eb;
 
     for(int c = 0; c < _batchsize; c++)
     {
@@ -216,43 +233,80 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
       }
     }
     Ec /= (double)_batchsize;
+    VLOG(30) << "E[c]:";
+    VLOG(30) << Ec;
 
     EW = z1 * ABatch.T() - z2 * Agenerated.T();
+    VLOG(30) << "E[W]:";
+    VLOG(30) << EW;
+
     EV = z1 * SBatch.T() - z2 * SBatch.T();
+    VLOG(30) << "E[V]:";
+    VLOG(30) << EV;
 
     tmp = _alpha * Eb;
     _crbm->changeb(tmp);
+    VLOG(30) << "New b:";
+    VLOG(30) << _crbm->b();
+
     tmp = _alpha * Ec;
     _crbm->changec(tmp);
+    VLOG(30) << "New c:";
+    VLOG(30) << _crbm->c();
 
     newW = _crbm->W() + _alpha * EW;
+    VLOG(30) << "New W:";
+    VLOG(30) << newW;
+
     newV = _crbm->V() + _alpha * EV;
+    VLOG(30) << "New V:";
+    VLOG(30) << newV;
 
     if(_momentum > 0.0)
     {
       tmp = (_alpha * _momentum) * _vb;
       _crbm->changeb(tmp);
-      // tmp = _alpha * _momentum * _vb;
-      // _crbm->changec(tmp);
+      VLOG(30) << "Momentum new W:";
+      VLOG(30) << newW;
+      tmp = (_alpha * _momentum) * _vb;
+      _crbm->changec(tmp);
+      VLOG(30) << "Momentum new V:";
+      VLOG(30) << newV;
       // newW = newW + _alpha * _momentum * _vW;
       // newV = newV + _alpha * _momentum * _vV;
     }
 
-    // if(_weightcost > 0.0)
-    // {
-      // newW = (1.0 - _weightcost) * newW;
-      // newV = (1.0 - _weightcost) * newV;
-    // }
+    if(_weightcost > 0.0)
+    {
+      newW = (1.0 - _weightcost) * newW;
+      VLOG(30) << "Weight cost new W:";
+      VLOG(30) << newW;
+      newV = (1.0 - _weightcost) * newV;
+      VLOG(30) << "Weight cost new V:";
+      VLOG(30) << newV;
+    }
 
-    // _vb = Eb;
-    // _vc = Ec;
-    // _vW = EW;
-    // _vV = EV;
+    _vb = Eb;
+    VLOG(30) << "vb:";
+    VLOG(30) << _vb;
+    _vc = Ec;
+    VLOG(30) << "vc:";
+    VLOG(30) << _vc;
+    _vW = EW;
+    VLOG(30) << "vW:";
+    VLOG(30) << _vW;
+    _vV = EV;
+    VLOG(30) << "vV:";
+    VLOG(30) << _vV;
 
     _crbm->setW(newW);
     _crbm->setV(newV);
 
+    if(_usePB) progressbar_inc(progress);
   }
+  if(_usePB) progressbar_finish(progress);
+
+  CRBMIO::write(out, _crbm);
 }
 
 void CRBMTrainer::__randomAInit(Matrix& A)
@@ -277,3 +331,7 @@ void CRBMTrainer::__copy(Matrix& dst, const Matrix& src, int index)
   }
 }
 
+void CRBMTrainer::setUseProgressBar(bool usePB)
+{
+  _usePB = usePB;
+}

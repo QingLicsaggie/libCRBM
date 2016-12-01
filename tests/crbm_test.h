@@ -8,6 +8,7 @@ class crbmTest : public CppUnit::TestFixture
   CPPUNIT_TEST(testRandomInit);
   CPPUNIT_TEST(testUp);
   CPPUNIT_TEST(testDown);
+  CPPUNIT_TEST(testGetSet);
   CPPUNIT_TEST_SUITE_END();
 
   public:
@@ -16,5 +17,6 @@ class crbmTest : public CppUnit::TestFixture
     void testRandomInit();
     void testUp();
     void testDown();
+    void testGetSet();
 
 };

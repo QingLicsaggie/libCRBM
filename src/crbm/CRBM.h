@@ -27,6 +27,7 @@ namespace libcrbm
         int n() {return _n;};
         int m() {return _m;};
         int k() {return _k;};
+        int uditerations() {return _uditerations;};
 
         double W(int i, int j) {return _W(i,j);};
         double V(int i, int j) {return _V(i,j);};

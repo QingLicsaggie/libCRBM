@@ -29,7 +29,8 @@ namespace libcrbm
 
         ~CRBMTrainer();
 
-        void train(string inputFilename, string outputFilename, int m);
+        void train(string inputFilename, string outputFilename, string out, int m);
+        void setUseProgressBar(bool usePB);
 
       private:
         void   __copy(Matrix& dst, const Matrix& src, int index);
@@ -51,6 +52,8 @@ namespace libcrbm
         int    _nrOfInputUnits;
         int    _nrOfHiddenUnits;
         int    _nrOfOutputUnits;
+
+        bool   _usePB;
 
         Matrix _vW;            // for the momentum
         Matrix _vV;            // for the momentum

@@ -16,7 +16,8 @@ DEFINE_double(a,  0.01,  "alpha");
 DEFINE_double(mo, 0.01,  "momentum");
 DEFINE_double(wc, 0.01,  "weight cost");
 DEFINE_double(p,  0.01,  "perturbation");
-DEFINE_bool(lerr,  false, "also log to stderr");
+DEFINE_bool(lerr, false, "also log to stderr");
+DEFINE_bool(pb,   false, "show progress bar");
 
 
 int main(int argc, char** argv)
@@ -35,7 +36,8 @@ int main(int argc, char** argv)
                                          FLAGS_wc,
                                          FLAGS_p);
 
-  trainer->train(FLAGS_S, FLAGS_A, FLAGS_m);
+  trainer->setUseProgressBar(FLAGS_pb);
+  trainer->train(FLAGS_S, FLAGS_A, FLAGS_o, FLAGS_m);
 
   return 0;
 }
