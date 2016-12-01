@@ -5,23 +5,14 @@
 
 using namespace libcrbm;
 
-RBM::RBM(int n, int m, int k)
-  :  _W(m,n),  _V(m,k),  _b(n,1),  _c(m,1),
-    _Wt(n,m),
-    _vW(m,n), _vV(m,k), _vb(n,1), _vc(m,1)
+RBM::RBM(int n, int m, int k, int uditerations)
+  :  _W(m,n), _V(m,k), _b(n,1), _c(m,1), _Wt(n,m)
 {
-    _n            = n;
-    _m            = m;
-    _k            = k;
-    _uditerations = 0;
-    _alpha        = 0.0;
-    _momentum     = 0.0;
-    _weightcost   = 0.0;
-    _pertubation  = 0.0;
-    _numepochs    = 0;
-    _batchsize    = 0;
+  _n            = n;
+  _m            = m;
+  _k            = k;
+  _uditerations = uditerations;
 }
-
 
 void RBM::initRandomWeights(double w)
 {

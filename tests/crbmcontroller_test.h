@@ -4,11 +4,13 @@
 class crbmcontrollerTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(crbmcontrollerTest);
-  CPPUNIT_TEST(testUpdate);
+  CPPUNIT_TEST(testUpdate1);
+  // CPPUNIT_TEST(testUpdate2);
   CPPUNIT_TEST_SUITE_END();
 
   public:
 
-    void testUpdate();
+    void testUpdate1();
+    void testUpdate2();
 
 };

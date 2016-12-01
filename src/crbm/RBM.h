@@ -9,7 +9,7 @@ namespace libcrbm
   {
     public:
 
-      RBM(int n, int m, int k);
+      RBM(int n, int m, int k, int uditerations);
       // ~RBM();
 
       //RBM(const RBM);
@@ -41,23 +41,12 @@ namespace libcrbm
       int    _m;            // number of hidden units
       int    _k;            // number of input units
       int    _uditerations; // number of up-down iterations
-      double _alpha;        // learning rate
-      double _momentum;     // contribution of the previous gradient
-      double _weightcost;   // weight cost for L2
-      double _pertubation;  // add randomness to the data
-      int    _numepochs;    // number of training epochs
-      int    _batchsize;    // size of training data batches
 
       Matrix _W;            // interaction weights between hidden and outputs
       Matrix _Wt;           // transposed W
       Matrix _V;            // interaction weights between hidden and inputs
       Matrix _b;            // bias values for output
       Matrix _c;            // bias values for hidden
-
-      Matrix _vW;           // for the momentum
-      Matrix _vV;           // for the momentum
-      Matrix _vb;           // for the momentum
-      Matrix _vc;           // for the momentum
   };
 }
 

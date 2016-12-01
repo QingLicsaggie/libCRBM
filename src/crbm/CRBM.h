@@ -12,7 +12,7 @@ namespace libcrbm
     {
       public:
 
-        CRBM(int n, int m, int k);
+        CRBM(int n, int m, int k, int uditerations);
         ~CRBM();
 
         void learn(Matrix& x, Matrix& y);
@@ -26,6 +26,7 @@ namespace libcrbm
         Matrix _x; // input
         Matrix _y; // hidden
         Matrix _z; // output
+
 
     };
   }

@@ -22,7 +22,8 @@ namespace libcrbm
         CRBMController(int bins,
                        int nrOfSensors,
                        int nrOfActuators,
-                       int nrOfHiddenUnits);
+                       int nrOfHiddenUnits,
+                       int uditerations);
         ~CRBMController();
 
         void update(double* sensors, double* actuators);
@@ -40,8 +41,8 @@ namespace libcrbm
         int          _nrOfHiddenUnits;
         int          _nrOfOutputUnits;
 
-        Matrix       _binaryInput;
-        Matrix       _binaryOutput;
+        Matrix       _y;
+        Matrix       _x;
 
         double*      _tmpInput;
         double*      _tmpOutput;

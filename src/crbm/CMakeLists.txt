@@ -5,6 +5,7 @@ set(SRC
   RBM.cpp
   CRBM.cpp
   CRBMController.cpp
+  CRBMTrainer.cpp
   Random.cpp
   Discretiser.cpp
 )

@@ -11,6 +11,7 @@ set(LIBRARY_OUTPUT_PATH          ${PROJECT_BINARY_DIR}/lib)
 
 set(CMAKE_VERBOSE_MAKEFILE       OFF)
 
+
 if(APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG        "-g")
   set(CMAKE_CXX_FLAGS_RELEASE      "-g")

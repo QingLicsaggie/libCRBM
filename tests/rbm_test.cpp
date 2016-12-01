@@ -15,11 +15,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( rbmTest );
 
 void rbmTest::testInit()
 {
-  RBM* rbm = new RBM(10,20,30);
-
   int n = 10;
   int m = 20;
   int k = 30;
+
+  RBM* rbm = new RBM(n, m, k, 10);
 
   CPPUNIT_ASSERT_EQUAL(n, rbm->n());
   CPPUNIT_ASSERT_EQUAL(m, rbm->m());
@@ -58,7 +58,7 @@ void rbmTest::testRandomInit()
   int m = 20;
   int k = 30;
 
-  RBM* rbm = new RBM(n,m,k);
+  RBM* rbm = new RBM(n,m,k,10);
 
   rbm->initRandomWeights();
   rbm->initHiddenBiasValues();

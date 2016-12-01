@@ -1,0 +1,191 @@
+%\documentclass[11pt,twoside,openright]{article}
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{nicefrac}
+\usepackage{graphicx}
+\usepackage[sort&compress]{natbib}
+\usepackage{sfmath}
+\usepackage[left=2.5cm,right=2cm,%
+           top=1.5cm,bottom=2cm,%
+           includefoot,includehead]{geometry}
+\usepackage{authblk}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+\usepackage[draft=false,colorlinks,%
+            urlcolor=black,citecolor=black,%
+            linkcolor=black,pdfborder={0 0 0},%
+            pdfpagemode=UseNone]{hyperref}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\renewcommand*\familydefault{\sfdefault}
+\allowdisplaybreaks{}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+
+\author[1]{Keyan Ghazi-Zahedi \thanks{zahedi@mis.mpg.de}}
+\affil[1]{Max Planck Institute for Mathematics in the Sciences, Leipzig, Germany}
+
+\renewcommand\Authands{ and }
+
+
+\title{Implemented Equations}
+\begin{document}
+\maketitle
+
+\section{Binary CRBM}
+\begin{align}
+  V & \in \mathbb{R}^{m\times k}\\
+  W & \in \mathbb{R}^{m\times n}\\
+  b & \in \mathbb{R}^{n}\\
+  c & \in \mathbb{R}^{m}\\
+  y & \in \mathbb{R}^{k}\\
+  x & \in \mathbb{R}^{n}\\
+  z & \in \mathbb{R}^{m}
+\end{align}
+
+Binary up:
+\begin{align}
+  z & = c + V \cdot y + W \cdot x\\
+  z & = \mathrm{sigm}(z)\\
+  z & = \text{set randomly to true false, based on $uniform() > z_i$}
+\end{align}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Binary up}\label{alg:binary_up}
+    \Require $x \in \mathbb{R}^n$
+    \Require $y \in \mathbb{R}^k$
+    \Ensure  $z \in \mathbb{R}^m$
+    \State{$z \leftarrow  c + V \cdot y + W \cdot x$}
+    \State{$z \leftarrow \mathrm{sigm}(z)$}
+    \State{$z \leftarrow$ set randomly to true false, based on $uniform() >
+      z_i$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Binary down}\label{alg:binary_down}
+    \Require $z \in \mathbb{R}^m$
+    \Ensure  $x \in \mathbb{R}^n$
+    \State{$x \leftarrow b + W^T \cdot z$}
+    \State{$x \leftarrow \mathrm{sigm}(x)$}
+    \State{$x \leftarrow$ set randomly to true false, based on $uniform() > x_i$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Control update}\label{alg:control_update}
+    \Require $x \in \mathbb{R}^n$
+    \Require $y \in \mathbb{R}^k$
+    \Require $u \in \mathbb{N}$
+    \Ensure  $x \in \mathbb{R}^n$
+    \Ensure  $z \in \mathbb{R}^m$
+    \State{$z \leftarrow \mathrm{binary\_up}(y, x)$}
+    \For{$i$ from $1$ to $u$}
+    \State{$x \leftarrow \mathrm{binary\_down}(z)$}
+    \State{$z \leftarrow \mathrm{binary\_up}(y,x)$}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Learn update}\label{alg:learn_update}
+    \Require $x \in \mathbb{R}^n$
+    \Require $y \in \mathbb{R}^k$
+    \Require $u \in \mathbb{N}$
+    \Ensure  $x \in \mathbb{R}^n$
+    \Ensure  $z \in \mathbb{R}^m$
+    \State{$z \leftarrow \mathrm{binary\_up}(y, x)$}
+    \For{$i$ from $1$ to $u-1$}
+    \State{$x \leftarrow \mathrm{binary\_down}(z)$}
+    \State{$z \leftarrow \mathrm{binary\_up}(y,x)$}
+    \EndFor
+    \State{$x \leftarrow \mathrm{binary\_down}(z)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Initialise $b$}\label{alg:initialise_b}
+    \Require $n \in \mathbb{N}$ \Comment{Nr.~of input units}
+    \Require $t \in \mathbb{N}$ \Comment{Nr.~of rows in the data}
+    \For{$i$ from $1$ to $n$}
+    \State{$s \leftarrow \mathrm{columnsum}(\hat{S}(i))$}
+    \If{$s = t$} \Comment{Only 1's in the column}
+    \State{$p \leftarrow \nicefrac{t-1}{t}$}
+    \ElsIf{$s == 0$}\Comment{Only 0's in the column}
+    \State{$p \leftarrow \nicefrac{1}{t}$}
+    \Else
+    \State{$p \leftarrow \nicefrac{s}{t}$}
+    \EndIf
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+  \begin{algorithmic}[1]
+    \caption{Training}\label{alg:training}
+    \Require CRBM
+    \Require $S \in \mathbb{R}^{t \times |S|}$
+    \Require $A \in \mathbb{R}^{t \times |A|}$
+    \Require $\mathrm{bins} \in \mathbb{N}$
+    \Require $\mathrm{batchsize} \in \mathbb{N}$
+    \Require $\mathrm{numepochs} \in \mathbb{N}$
+    \Ensure  $x \in \mathbb{R}^n$
+    \Ensure  $z \in \mathbb{R}^m$
+    \Ensure  $m \in \mathbb{R}$ \Comment{Momentum parameter}
+    \Ensure  $\gamma \in \mathbb{R}$ \Comment{Weight cost}
+    \State{$N \leftarrow \lceil\log_2(\mathrm{bins})\rceil$}
+    \State{$\hat{S} \leftarrow \mathrm{binarise}(S)$}
+    \State{$\hat{A} \leftarrow \mathrm{binarise}(A)$}
+    \State{$rbm.W \leftarrow \mathcal{N}(0,0.01)$}
+    \State{$rbm.V \leftarrow \mathcal{N}(0,0.01)$}
+    \State{$rbm.c \leftarrow 0$}
+    \State{$rbm.b \leftarrow $ initialise based on data (see Alg.~\ref{alg:initialise_b}}
+    \For{$i$ in $1$ to $\mathrm{numepochs}$}
+    \State{$r \leftarrow \mathrm{rand}(t-\mathrm{batchsize})$}
+    \State{$\mathrm{indices} \leftarrow [r, r+\mathrm{batchsize}]$}
+    \State{$\tilde{S} \leftarrow \hat{S}(\mathrm{rows} = \mathrm{indices})$}
+    \State{$\tilde{A} \leftarrow \hat{A}(\mathrm{rows} = \mathrm{indices})$}
+    \State{$z \leftarrow \mathrm{binary\_up}(\tilde{S}, \tilde{A})$}
+    \State{$\bar{A} \leftarrow $ random action matrix $\in [0,1]^{|\tilde{A}|}$}
+    \State{$(\bar{A},Z) \leftarrow \mathrm{learn}(s,\bar{A})$}
+    \State{$\mathbb{E}\{b\} \leftarrow \mathrm{avg}(\tilde{A}) - \mathrm{avg}(\bar{A})$}
+    \State{$\mathbb{E}\{c\} \leftarrow \mathrm{avg}(\tilde{z}) - \mathrm{avg}(\bar{Z})$}
+    \State{$\mathbb{E}\{W\} \leftarrow \nicefrac{z^T a - Z^T \bar{A}}{\mathrm{batchsize}}$}
+    \State{$\mathbb{E}\{V\} \leftarrow \nicefrac{z^T s - Z^T \bar{s}}{\mathrm{batchsize}}$}
+    \State{$b \leftarrow b + \alpha \mathbb{E}\{b\}$}
+    \State{$c \leftarrow c + \alpha \mathbb{E}\{c\}$}
+    \State{$W \leftarrow W + \alpha \mathbb{E}\{W\}$}
+    \State{$V \leftarrow V + \alpha \mathbb{E}\{V\}$}
+    \If{$m > 0$}
+    \State{$b \leftarrow b + \alpha \cdot m \cdot b^m$}
+    \State{$c \leftarrow c + \alpha \cdot m \cdot c^m$}
+    \State{$W \leftarrow W + \alpha \cdot m \cdot W^m$}
+    \State{$V \leftarrow V + \alpha \cdot m \cdot V^m$}
+    \EndIf
+    \If{$\gamma > 0$}
+    \State{$W \leftarrow (1-\gamma)W$}
+    \State{$V \leftarrow (1-\gamma)V$}
+    \EndIf
+    \State{$b^m \leftarrow \mathbb{E}(b)$}
+    \State{$c^m \leftarrow \mathbb{E}(c)$}
+    \State{$W^m \leftarrow \mathbb{E}(W)$}
+    \State{$V^m \leftarrow \mathbb{E}(V)$}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\end{document}

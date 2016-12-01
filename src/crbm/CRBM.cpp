@@ -9,8 +9,8 @@ using namespace std;
 using namespace libcrbm;
 using namespace libcrbm::binary;
 
-CRBM::CRBM(int n, int m, int k)
-  : RBM(n, m, k), _x(n,1), _y(k,1), _z(1,m)
+CRBM::CRBM(int n, int m, int k, int u)
+  : RBM(n, m, k, u), _x(n,1), _y(k,1), _z(1,m)
 {
   Random::initialise();
 }
@@ -40,17 +40,20 @@ void CRBM::control(Matrix& y, Matrix& x)
   __down(_z);
 }
 
-void CRBM::__up(Matrix& x, Matrix& y)
+void CRBM::__up(Matrix& y, Matrix& x)
 {
-  // cout << "V:" << _V << endl;
-  // cout << "W:" << _W << endl;
-  // cout << "b:" << _b << endl;
-  // cout << "c:" << _c << endl;
-  // cout << "x:" <<  x << endl;
-  // cout << "y:" <<  y << endl;
-  // cout << "z:" << _z << endl;
+  cout << "up" << endl;
+  cout << "V:" << _V << endl;
+  cout << "y:" <<  y << endl;
+  _V * y;
 
+  cout << "W:" << _W << endl;
+  cout << "x:" <<  x << endl;
   _W * x;
+
+  cout << "b:" << _b << endl;
+  cout << "c:" << _c << endl;
+  cout << "z:" << _z << endl;
 
   _z = _c + _V * y + _W * x;
   for(int i = 0; i < _m; i++)
@@ -65,6 +68,9 @@ void CRBM::__up(Matrix& x, Matrix& y)
 
 void CRBM::__down(Matrix& z)
 {
+  cout << "down" << endl;
+  cout << "Wt:" << _Wt << endl;
+  cout << "z:" <<  z << endl;
   _x = _b + _Wt * z;
   for(int i = 0; i < _n; i++)
   {
