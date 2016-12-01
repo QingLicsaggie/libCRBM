@@ -32,6 +32,8 @@ namespace libcrbm
         void train(string inputFilename, string outputFilename, int m);
 
       private:
+        void   __copy(Matrix& dst, const Matrix& src, int index);
+
         int    _bins;
         int    _batchsize;     // size of training data batches
         int    _numepochs;     // number of training epochs

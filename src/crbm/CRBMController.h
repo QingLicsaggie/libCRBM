@@ -16,7 +16,7 @@ namespace libcrbm
 {
   namespace binary
   {
-    class CRBMController : public CRBM
+    class CRBMController
     {
       public:
         CRBMController(int bins,
@@ -27,6 +27,11 @@ namespace libcrbm
         ~CRBMController();
 
         void update(double* sensors, double* actuators);
+
+        void setW(Matrix& W) {_crbm->setW(W);};
+        void setV(Matrix& V) {_crbm->setV(V);};
+        void setb(Matrix& b) {_crbm->setb(b);};
+        void setc(Matrix& c) {_crbm->setc(c);};
 
         //CRBMController(const CRBMController);
         //CRBMController operator=(const CRBMController);
@@ -47,9 +52,10 @@ namespace libcrbm
         double* _tmpInput;
         double* _tmpOutput;
 
-        int     _unitPerSenAct; // nr of unit for each sensor and actuator
+        int     _unitsPerSenAct; // nr of unit for each sensor and actuator
 
         Discretiser* _d;
+        CRBM* _crbm;
     };
   }
 }

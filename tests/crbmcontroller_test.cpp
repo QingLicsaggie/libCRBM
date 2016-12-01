@@ -27,7 +27,7 @@ void crbmcontrollerTest::testUpdate1()
                                             nrOfSensors,
                                             nrOfActuators,
                                             nrOfHiddenUnits,
-                                            10);
+                                            2);
 
   double sensors[nrOfSensors];
   double actuators[nrOfActuators];
@@ -86,29 +86,33 @@ void crbmcontrollerTest::testUpdate1()
 
   for(int i = 0; i < 5000; i++)
   {
+    // cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << i << endl;
     crbm->update(sensors, actuators);
+    // cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< " << i << endl;
   }
 }
 
 void crbmcontrollerTest::testUpdate2()
 {
-  for(int runs = 0; runs < 10; runs++)
+  for(int runs = 0; runs < 20; runs++)
   {
-    int bins            = 10 + (int)(Random::unit() * 20);
-    int nrOfSensors     = 1  + (int)(Random::unit() * 20);
-    int nrOfActuators   = 1  + (int)(Random::unit() * 20);
-    int nrOfHiddenUnits = 1  + (int)(Random::unit() * 20);
+    int bins            = 2 + (int)(Random::unit() * 50);
+    int nrOfSensors     = 1 + (int)(Random::unit() * 50);
+    int nrOfActuators   = 1 + (int)(Random::unit() * 50);
+    int nrOfHiddenUnits = 1 + (int)(Random::unit() * 50);
 
+    cout << endl;
     cout << "Bins:             " << bins << endl;
     cout << "Nr. of Sensors:   " << nrOfSensors << endl;
     cout << "Nr. of Actuators: " << nrOfActuators << endl;
     cout << "Nr. of Hidden:    " << nrOfHiddenUnits << endl;
 
+
     CRBMController* crbm = new CRBMController(bins,
                                               nrOfSensors,
                                               nrOfActuators,
                                               nrOfHiddenUnits,
-                                              10);
+                                              2);
 
     double sensors[nrOfSensors];
     double actuators[nrOfActuators];
@@ -167,7 +171,9 @@ void crbmcontrollerTest::testUpdate2()
 
     for(int i = 0; i < 5000; i++)
     {
+      // cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << i << endl;
       crbm->update(sensors, actuators);
+      // cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< " << i << endl;
     }
   }
 }

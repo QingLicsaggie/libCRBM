@@ -1,6 +1,7 @@
 #include <crbm/CRBMTrainer.h>
 #include <crbm/Discretiser.h>
 #include <crbm/Discretiser.h>
+#include <crbm/Random.h>
 
 #include <entropy++/Csv.h>
 #include <entropy++/Container.h>
@@ -130,7 +131,56 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
     }
     b(c,0) = p;
   }
-  VLOG(10) << b;
+  VLOG(20) << b;
   _crbm->setb(b);
+
+  int length = binarisedInput->rows();
+
+  VLOG(20) << "Copying binarised data to matrix";
+  Matrix S(binarisedInput->rows(),  binarisedInput->columns());
+  Matrix A(binarisedOutput->rows(), binarisedOutput->columns());
+
+  for(int r = 0; r < binarisedInput->rows(); r++)
+  {
+    for(int c = 0; c < binarisedInput->columns(); c++)
+    {
+      S(r,c) = binarisedInput->get(r,c);
+    }
+  }
+
+  for(int r = 0; r < binarisedOutput->rows(); r++)
+  {
+    for(int c = 0; c < binarisedOutput->columns(); c++)
+    {
+      A(r,c) = binarisedOutput->get(r,c);
+    }
+  }
+  VLOG(40) << "S Matrix" << endl << S;
+  VLOG(40) << "A Matrix" << endl << A;
+
+  Matrix SBatch(_batchsize, S.cols());
+  Matrix ABatch(_batchsize, A.cols());
+
+  // Let the training begin
+  VLOG(10) << "Training begins, with " << _numepochs << " epochs and batch size of " << _batchsize;
+  for(int i = 0; i < _numepochs; i++)
+  {
+    int dataStartIndex = Random::rand(0, length - _batchsize);
+    __copy(SBatch, S, dataStartIndex);
+    __copy(ABatch, A, dataStartIndex);
+
+    _crbm->up(SBatch, ABatch);
+  }
+}
+
+void CRBMTrainer::__copy(Matrix& dst, const Matrix& src, int index)
+{
+  for(int r = 0; r < dst.rows(); r++)
+  {
+    for(int c = 0; c < dst.cols(); c++)
+    {
+      dst(r,c) = src(index + r, c);
+    }
+  }
 }
 

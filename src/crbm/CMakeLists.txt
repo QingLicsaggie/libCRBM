@@ -2,7 +2,6 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 link_directories(${PROJECT_BINARY_DIR}/lib)
 
 set(SRC
-  RBM.cpp
   CRBM.cpp
   CRBMController.cpp
   CRBMTrainer.cpp
