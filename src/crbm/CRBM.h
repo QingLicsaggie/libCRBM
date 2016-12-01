@@ -33,6 +33,16 @@ namespace libcrbm
         double b(int i)        {return _b(i,0);};
         double c(int i)        {return _c(i,0);};
 
+        const Matrix& W() {return _W;};
+        const Matrix& V() {return _V;};
+        const Matrix& b() {return _b;};
+        const Matrix& c() {return _c;};
+
+        void changeb(Matrix& db);
+        void changec(Matrix& dc);
+        void changeb(double alpha);
+        void changec(double alpha);
+
         void setW(Matrix& W);
         void setV(Matrix& V);
         void setb(Matrix& b);

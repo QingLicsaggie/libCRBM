@@ -192,3 +192,34 @@ void CRBM::setc(Matrix& c)
   _c = c;
 }
 
+void CRBM::changeb(Matrix& db)
+{
+  for(int r = 0; r < _b.rows(); r++)
+  {
+    for(int c = 0; c < _c.cols(); c++)
+    {
+      _b(r,c) += db(r, c % db.cols());
+    }
+  }
+}
+
+void CRBM::changec(Matrix& dc)
+{
+  for(int r = 0; r < _c.rows(); r++)
+  {
+    for(int c = 0; c < _c.cols(); c++)
+    {
+      _c(r,c) += dc(r, c % dc.cols());
+    }
+  }
+}
+
+void CRBM::changeb(double alpha)
+{
+  _b *= alpha;
+}
+
+void CRBM::changec(double alpha)
+{
+  _c *= alpha;
+}

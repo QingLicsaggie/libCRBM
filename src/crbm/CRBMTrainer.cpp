@@ -160,18 +160,109 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, int m)
 
   Matrix SBatch(S.cols(), _batchsize);
   Matrix ABatch(A.cols(), _batchsize);
+  Matrix AInit(A.cols(),  _batchsize);
+
+  Matrix Eb(n,1);
+  Matrix Ec(m,1);
+  Matrix EW(m,n);
+  Matrix EV(m,k);
+  Matrix newb(1,1);
+  Matrix newc(1,1);
+  Matrix newV(1,1);
+  Matrix newW(1,1);
 
   _crbm->initLearning(_batchsize);
+  Matrix tmp(0,0);
+
+  _vb.resize(n,1);
+  _vc.resize(n,1);
+  _vW.resize(m,n);
+  _vV.resize(m,k);
 
   // Let the training begin
   VLOG(10) << "Training begins, with " << _numepochs << " epochs and batch size of " << _batchsize;
   for(int i = 0; i < _numepochs; i++)
   {
+    cout << i << endl;
     int dataStartIndex = Random::rand(0, length - _batchsize);
     __copy(SBatch, S, dataStartIndex);
     __copy(ABatch, A, dataStartIndex);
+    __randomAInit(AInit);
 
     _crbm->up(SBatch, ABatch);
+    Matrix z1 = _crbm->z();
+    // cout << "z1:" << endl << z1 << endl;
+    _crbm->learn(SBatch, AInit);
+    Matrix z2 = _crbm->z();
+    Matrix Agenerated = _crbm->x();
+    // cout << "z2:" << endl << z2 << endl;
+
+    for(int c = 0; c < _batchsize; c++)
+    {
+      Eb = 0.0;
+      for(int r = 0; r < n; r++)
+      {
+        Eb(r,0) += ABatch(r, c) - Agenerated(r, c);
+      }
+    }
+    Eb /= (double)_batchsize;
+
+    for(int c = 0; c < _batchsize; c++)
+    {
+      Ec = 0.0;
+      for(int r = 0; r < m; r++)
+      {
+        Ec(r,0) += z1(r, c) - z1(r, c);
+      }
+    }
+    Ec /= (double)_batchsize;
+
+    EW = z1 * ABatch.T() - z2 * Agenerated.T();
+    EV = z1 * SBatch.T() - z2 * SBatch.T();
+
+    tmp = _alpha * Eb;
+    _crbm->changeb(tmp);
+    tmp = _alpha * Ec;
+    _crbm->changec(tmp);
+
+    newW = _crbm->W() + _alpha * EW;
+    newV = _crbm->V() + _alpha * EV;
+
+    if(_momentum > 0.0)
+    {
+      tmp = (_alpha * _momentum) * _vb;
+      _crbm->changeb(tmp);
+      // tmp = _alpha * _momentum * _vb;
+      // _crbm->changec(tmp);
+      // newW = newW + _alpha * _momentum * _vW;
+      // newV = newV + _alpha * _momentum * _vV;
+    }
+
+    // if(_weightcost > 0.0)
+    // {
+      // newW = (1.0 - _weightcost) * newW;
+      // newV = (1.0 - _weightcost) * newV;
+    // }
+
+    // _vb = Eb;
+    // _vc = Ec;
+    // _vW = EW;
+    // _vV = EV;
+
+    _crbm->setW(newW);
+    _crbm->setV(newV);
+
+  }
+}
+
+void CRBMTrainer::__randomAInit(Matrix& A)
+{
+  for(int r = 0; r < A.rows(); r++)
+  {
+    for(int c = 0; c < A.cols(); c++)
+    {
+      A(r,c) = (Random::unit() < 0.5)?0:1;
+    }
   }
 }
 
