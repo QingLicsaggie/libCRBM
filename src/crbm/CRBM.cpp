@@ -94,13 +94,12 @@ void CRBM::up(Matrix& y, Matrix& x)
   // cout << "z:" << _z << endl;
 
   _z = _c + _V * y + _W * x;
-  for(int i = 0; i < _m; i++)
+  for(int r = 0; r < _z.rows(); r++)
   {
-    _z(i,0) = __sigm(_z(i,0));
-  }
-  for(int i = 0; i < _m; i++)
-  {
-    _z(i,0) = (Random::unit() > _z(i,0))?1.0:0.0;
+    for(int c = 0; c < _z.cols(); c++)
+    {
+      _z(r,c) = (Random::unit() > __sigm(_z(r,c)))?1.0:0.0;
+    }
   }
 }
 
@@ -112,11 +111,7 @@ void CRBM::down(Matrix& z)
   _x = _b + _Wt * z;
   for(int i = 0; i < _n; i++)
   {
-    _x(i, 0) = __sigm(_x(i,0));
-  }
-  for(int i = 0; i < _n; i++)
-  {
-    _x(i, 0) = (Random::unit() > _x(i, 0))?1.0:0.0;
+    _x(i, 0) = (Random::unit() > __sigm(_x(i, 0)))?1.0:0.0;
   }
 }
 

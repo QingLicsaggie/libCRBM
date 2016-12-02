@@ -161,6 +161,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   VLOG(40) << "S Matrix" << endl << S;
   VLOG(40) << "A Matrix" << endl << A;
 
+  VLOG(10) << "Batch size: " << _batchsize;
   Matrix SBatch(S.cols(), _batchsize);
   Matrix ABatch(A.cols(), _batchsize);
   Matrix AInit(A.cols(),  _batchsize);

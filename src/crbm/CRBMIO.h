@@ -13,7 +13,7 @@ class CRBMIO
   public:
 
     static void write(string filename, CRBM* crbm);
-    static void read(string filename, CRBM* crbm);
+    static CRBM* read(string filename);
 
   private:
 };
