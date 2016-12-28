@@ -20,11 +20,12 @@ void CRBMIO::write(string filename, CRBM *crbm)
   for(int i = 0; i < crbm->m(); i++) c(i, 0) = crbm->c(i);
   ofstream output;
   output.open(filename, std::ofstream::trunc);
-  output << "k,n,m,u: "
+  output << "k,n,m,u,b: "
     << crbm->k() << ","
     << crbm->n() << ","
     << crbm->m() << ","
-    << crbm->uditerations() << endl;
+    << crbm->uditerations() << ","
+    << crbm->bins() << endl;
   output << "b:" << endl << b;
   output << "c:" << endl << c;
   output << "W:" << endl << crbm->W();
@@ -38,7 +39,7 @@ CRBM* CRBMIO::read(string filename)
   ifstream input(filename);
   getline(input, line);
 
-  line = line.substr(9, string::npos);
+  line = line.substr(11, string::npos);
 
   vector<string> v;
   char_separator<char> sep(",");
@@ -48,12 +49,13 @@ CRBM* CRBMIO::read(string filename)
     v.push_back(t);
   }
 
-  int k = atoi(v[0].c_str());
-  int n = atoi(v[1].c_str());
-  int m = atoi(v[2].c_str());
-  int u = atoi(v[3].c_str());
+  int k    = atoi(v[0].c_str());
+  int n    = atoi(v[1].c_str());
+  int m    = atoi(v[2].c_str());
+  int u    = atoi(v[3].c_str());
+  int bins = atoi(v[4].c_str());
 
-  CRBM* crbm = new CRBM(k,m,n,u);
+  CRBM* crbm = new CRBM(k,m,n,u,bins);
 
   getline(input, line); // "b:"
   getline(input, line); // "rows x cols:"

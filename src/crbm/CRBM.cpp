@@ -14,7 +14,7 @@ using namespace libcrbm::binary;
 // m - hidden
 // n - output
 
-CRBM::CRBM(int k, int m, int n, int u)
+CRBM::CRBM(int k, int m, int n, int u, int bins)
   :  _W(m,n),  _V(m,k), _b(n,1), _c(m,1),
      _Wt(n,m), _x(n,1), _y(k,1), _z(m,1)
 {
@@ -22,6 +22,7 @@ CRBM::CRBM(int k, int m, int n, int u)
   _m                   = m;
   _n                   = n;
   _uditerations        = u;
+  _bins                = bins;
   _learningInitialised = false;
 
   Random::initialise();

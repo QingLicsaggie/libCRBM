@@ -110,7 +110,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
 
   VLOG(10) << "Creating CRBM with " << n << ", " << m << ", " << k;
 
-  _crbm = new CRBM(n, m, k, _uditerations);
+  _crbm = new CRBM(n, m, k, _uditerations, _bins);
   _crbm->initRandomWeights(0.01);
 
   // initialise b based on the data
@@ -267,43 +267,44 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     {
       tmp = (_alpha * _momentum) * _vb;
       _crbm->changeb(tmp);
-      VLOG(30) << "Momentum new W:";
+      VLOG(30) << "MOMENTUM new W:";
       VLOG(30) << newW;
       tmp = (_alpha * _momentum) * _vb;
       _crbm->changec(tmp);
-      VLOG(30) << "Momentum new V:";
+      VLOG(30) << "MOMENTUM new V:";
       VLOG(30) << newV;
       // newW = newW + _alpha * _momentum * _vW;
       // newV = newV + _alpha * _momentum * _vV;
+
+      _vb = Eb;
+      VLOG(30) << "vb:";
+      VLOG(30) << _vb;
+      _vc = Ec;
+      VLOG(30) << "vc:";
+      VLOG(30) << _vc;
+      _vW = EW;
+      VLOG(30) << "vW:";
+      VLOG(30) << _vW;
+      _vV = EV;
+      VLOG(30) << "vV:";
+      VLOG(30) << _vV;
     }
 
     if(_weightcost > 0.0)
     {
       newW = (1.0 - _weightcost) * newW;
-      VLOG(30) << "Weight cost new W:";
+      VLOG(30) << "WEIGHT COST new W:";
       VLOG(30) << newW;
       newV = (1.0 - _weightcost) * newV;
-      VLOG(30) << "Weight cost new V:";
+      VLOG(30) << "WEIGHT COST new V:";
       VLOG(30) << newV;
     }
-
-    _vb = Eb;
-    VLOG(30) << "vb:";
-    VLOG(30) << _vb;
-    _vc = Ec;
-    VLOG(30) << "vc:";
-    VLOG(30) << _vc;
-    _vW = EW;
-    VLOG(30) << "vW:";
-    VLOG(30) << _vW;
-    _vV = EV;
-    VLOG(30) << "vV:";
-    VLOG(30) << _vV;
 
     _crbm->setW(newW);
     _crbm->setV(newV);
 
     if(_usePB) progressbar_inc(progress);
+    if(i % 1000 == 0) CRBMIO::write(out, _crbm);
   }
   if(_usePB) progressbar_finish(progress);
 

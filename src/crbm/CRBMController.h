@@ -4,6 +4,7 @@
 #include <matrix/Matrix.h>
 #include <crbm/Discretiser.h>
 #include <crbm/CRBM.h>
+#include <crbm/CRBMIO.h>
 
 #include <stdint.h>
 #include <vector>
@@ -24,14 +25,17 @@ namespace libcrbm
                        int nrOfActuators,
                        int nrOfHiddenUnits,
                        int uditerations);
+        CRBMController(string filename);
         ~CRBMController();
 
         void update(double* sensors, double* actuators);
 
-        void setW(Matrix& W) {_crbm->setW(W);};
-        void setV(Matrix& V) {_crbm->setV(V);};
-        void setb(Matrix& b) {_crbm->setb(b);};
-        void setc(Matrix& c) {_crbm->setc(c);};
+        void setW(Matrix& W)       {_crbm->setW(W);};
+        void setV(Matrix& V)       {_crbm->setV(V);};
+        void setb(Matrix& b)       {_crbm->setb(b);};
+        void setc(Matrix& c)       {_crbm->setc(c);};
+        void setCRBM(CRBM* crbm)   {_crbm = crbm;};
+        void read(string filename) {_crbm = CRBMIO::read(filename);};
 
         //CRBMController(const CRBMController);
         //CRBMController operator=(const CRBMController);

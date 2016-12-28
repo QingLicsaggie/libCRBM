@@ -18,7 +18,7 @@ void crbmTest::testInit()
   int m = 20;
   int k = 30;
 
-  CRBM* crbm = new CRBM(k, m, n, 10);
+  CRBM* crbm = new CRBM(k, m, n, 10, 2);
 
   CPPUNIT_ASSERT_EQUAL(n, crbm->n());
   CPPUNIT_ASSERT_EQUAL(m, crbm->m());
@@ -57,7 +57,7 @@ void crbmTest::testRandomInit()
   int m = 20;
   int k = 30;
 
-  CRBM* crbm = new CRBM(k,m,n,10);
+  CRBM* crbm = new CRBM(k,m,n,10, 2);
 
   crbm->initRandomWeights();
   crbm->initHiddenBiasValues();
@@ -104,7 +104,7 @@ void crbmTest::testUp()
   int m = 20;
   int k = 30;
 
-  CRBM* crbm = new CRBM(k,m,n,10);
+  CRBM* crbm = new CRBM(k,m,n,10,2);
 
   crbm->initRandomWeights();
   crbm->initHiddenBiasValues();
@@ -122,7 +122,7 @@ void crbmTest::testDown()
   int m = 20;
   int k = 30;
 
-  CRBM* crbm = new CRBM(k,m,n,10);
+  CRBM* crbm = new CRBM(k,m,n,10,2);
 
   crbm->initRandomWeights();
   crbm->initHiddenBiasValues();
@@ -140,7 +140,7 @@ void crbmTest::testGetSet()
   int k     = 30;
   int index = 0;
 
-  CRBM* crbm = new CRBM(k,m,n,10);
+  CRBM* crbm = new CRBM(k,m,n,10,2);
   Matrix W = crbm->W();
   Matrix V = crbm->V();
   Matrix b = crbm->b();

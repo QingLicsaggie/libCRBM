@@ -23,3 +23,6 @@ target_link_libraries(CRBM ${Boost_LIBRARIES} Matrix m Entropy++ glog ncurses)
 
 add_executable(train main_train.cpp)
 target_link_libraries(train CRBM gflags)
+
+add_executable(run main_run.cpp)
+target_link_libraries(run CRBM gflags)

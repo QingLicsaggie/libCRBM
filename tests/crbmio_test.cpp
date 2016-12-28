@@ -21,7 +21,7 @@ void crbmioTest::testIO()
 
   int index = 0;
 
-  CRBM* crbm = new CRBM(k, m, n, 10);
+  CRBM* crbm = new CRBM(k, m, n, 10, 2);
 
   Matrix W = crbm->W();
   Matrix V = crbm->V();

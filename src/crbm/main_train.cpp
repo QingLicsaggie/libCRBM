@@ -32,9 +32,10 @@ int main(int argc, char** argv)
                                          FLAGS_ne,
                                          FLAGS_bs,
                                          FLAGS_a,
-                                         FLAGS_m,
+                                         FLAGS_mo,
                                          FLAGS_wc,
                                          FLAGS_p);
+
 
   trainer->setUseProgressBar(FLAGS_pb);
   trainer->train(FLAGS_S, FLAGS_A, FLAGS_o, FLAGS_m);

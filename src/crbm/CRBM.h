@@ -11,7 +11,7 @@ namespace libcrbm
     {
       public:
 
-        CRBM(int k, int n, int m, int uditerations);
+        CRBM(int k, int n, int m, int uditerations, int bins);
         ~CRBM();
 
         void learn(Matrix& x, Matrix& y);
@@ -54,6 +54,9 @@ namespace libcrbm
         const Matrix& z() { return _z; }
         void  initLearning(int n);
 
+        int bins() {return _bins;};
+
+
       private:
 
         double __sigm(double v);
@@ -62,6 +65,7 @@ namespace libcrbm
         int    _m;            // number of hidden units
         int    _k;            // number of input units
         int    _uditerations; // number of up-down iterations
+        int    _bins;
 
         Matrix _W;            // interaction weights between hidden and outputs
         Matrix _Wt;           // transposed W
