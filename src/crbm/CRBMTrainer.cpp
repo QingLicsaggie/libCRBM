@@ -38,6 +38,7 @@ CRBMTrainer::~CRBMTrainer()
 
 void CRBMTrainer::train(string inputFilename, string outputFilename, string out, int m)
 {
+  VLOG(10) << "Using " << m << " hidden units.";
   VLOG(10) << "reading S-file: " << inputFilename;
   entropy::DContainer* input  = entropy::Csv::read(inputFilename);
   VLOG(20) << "Sensors:   " << endl << *input;
@@ -178,7 +179,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   Matrix tmp(0,0);
 
   _vb.resize(n,1);
-  _vc.resize(n,1);
+  _vc.resize(m,1);
   _vW.resize(m,n);
   _vV.resize(m,k);
 
@@ -211,13 +212,14 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(30) << "A generated:";
     VLOG(30) << ABinary;
 
-    Eb = (ABatch.colMean() - ABinary.colMean());
-    Eb.transpose();
+    Eb = (ABatch.rowMean() - ABinary.rowMean());
+    // Eb.transpose();
     VLOG(60) << "E[b]:";
     VLOG(60) << Eb;
 
-    Ec = (z1.colMean() - z2.colMean());
-    Ec.transpose();
+    Ec = (z1.rowMean() - z2.rowMean());
+    // Ec.transpose();
+    // cout << "Ec: " << Ec.rows() << " " << Ec.cols() << endl;
     VLOG(60) << "E[c]:";
     VLOG(60) << Ec;
 
@@ -235,6 +237,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(60) << _crbm->b();
 
     tmp = _alpha * Ec;
+    // cout << "Ec: " << tmp.rows() << " " << tmp.cols() << endl;
     _crbm->changec(tmp);
     VLOG(60) << "New c:";
     VLOG(60) << _crbm->c();
@@ -253,7 +256,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
       _crbm->changeb(tmp);
       VLOG(60) << "MOMENTUM new W:";
       VLOG(60) << newW;
-      tmp = (_alpha * _momentum) * _vb;
+      tmp = (_alpha * _momentum) * _vc;
       _crbm->changec(tmp);
       VLOG(60) << "MOMENTUM new V:";
       VLOG(60) << newV;

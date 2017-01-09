@@ -36,7 +36,6 @@ int main(int argc, char** argv)
                                          FLAGS_wc,
                                          FLAGS_p);
 
-
   trainer->setUseProgressBar(FLAGS_pb);
   trainer->train(FLAGS_S, FLAGS_A, FLAGS_o, FLAGS_m);
 
