@@ -12,13 +12,12 @@ DEFINE_int64(m,   16,    "nr. of hidden units");
 DEFINE_int64(ud,  10,    "up-down iterations");
 DEFINE_int64(ne,  20000, "number of epochs");
 DEFINE_int64(bs,  50,    "batch size");
-DEFINE_double(a,  0.01,  "alpha");
-DEFINE_double(mo, 0.00,  "momentum");
-DEFINE_double(wc, 0.00,  "weight cost");
-DEFINE_double(p,  0.00,  "perturbation");
+DEFINE_double(a,  1.00,  "alpha");
+DEFINE_double(mo, 0.1,   "momentum");
+DEFINE_double(wc, 0.001, "weight cost");
+DEFINE_double(p,  0.01,  "perturbation");
 DEFINE_bool(lerr, false, "also log to stderr");
 DEFINE_bool(pb,   false, "show progress bar");
-
 
 int main(int argc, char** argv)
 {
