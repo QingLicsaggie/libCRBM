@@ -2,7 +2,6 @@
 #include <crbm/Discretiser.h>
 #include <crbm/Discretiser.h>
 #include <crbm/Random.h>
-#include <crbm/ext/progressbar.h>
 #include <crbm/CRBMIO.h>
 
 #include <entropy++/Csv.h>
@@ -164,7 +163,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   VLOG(10) << "Batch size: " << _batchsize;
   Matrix SBatch(S.cols(), _batchsize);
   Matrix ABatch(A.cols(), _batchsize);
-  Matrix AInit(A.cols(),  _batchsize);
+  Matrix ABinary(A.cols(),  _batchsize);
 
   Matrix Eb(n,1);
   Matrix Ec(m,1);
@@ -183,9 +182,6 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   _vW.resize(m,n);
   _vV.resize(m,k);
 
-  progressbar *progress;
-  if(_usePB) progress = progressbar_new("Training", _numepochs);
-
   // Let the training begin
   VLOG(10) << "Training begins, with " << _numepochs << " epochs and batch size of " << _batchsize;
   for(int i = 0; i < _numepochs; i++)
@@ -194,124 +190,110 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     int dataStartIndex = Random::rand(0, length - _batchsize);
     VLOG(10) << "Start index " << dataStartIndex;
     __copy(SBatch, S, dataStartIndex);
-    VLOG(30) << SBatch;
+    VLOG(50) << "SBatch:";
+    VLOG(50) << SBatch;
     __copy(ABatch, A, dataStartIndex);
-    VLOG(30) << ABatch;
-    __randomAInit(AInit);
-    VLOG(30) << AInit;
+    VLOG(50) << "ABatch:";
+    VLOG(50) << ABatch;
+    __randomABinary(ABinary);
+    VLOG(50) << "A Random initial value:";
+    VLOG(50) << ABinary;
 
     _crbm->up(SBatch, ABatch);
     Matrix z1 = _crbm->z();
-    VLOG(30) << "Z1:";
-    VLOG(30) << z1;
+    VLOG(200) << "Z1:";
+    VLOG(200) << z1;
     // cout << "z1:" << endl << z1 << endl;
-    _crbm->learn(SBatch, AInit);
+    _crbm->learn(SBatch, ABinary);
     Matrix z2 = _crbm->z();
-    VLOG(30) << "Z2:";
-    VLOG(30) << z2;
-    Matrix Agenerated = _crbm->x();
+    VLOG(200) << "Z2:";
+    VLOG(200) << z2;
     VLOG(30) << "A generated:";
-    VLOG(30) << Agenerated;
+    VLOG(30) << ABinary;
 
-    for(int c = 0; c < _batchsize; c++)
-    {
-      Eb = 0.0;
-      for(int r = 0; r < n; r++)
-      {
-        Eb(r,0) += ABatch(r, c) - Agenerated(r, c);
-      }
-    }
-    Eb /= (double)_batchsize;
-    VLOG(30) << "E[b]:";
-    VLOG(30) << Eb;
+    Eb = (ABatch.colMean() - ABinary.colMean());
+    Eb.transpose();
+    VLOG(60) << "E[b]:";
+    VLOG(60) << Eb;
 
-    for(int c = 0; c < _batchsize; c++)
-    {
-      Ec = 0.0;
-      for(int r = 0; r < m; r++)
-      {
-        Ec(r,0) += z1(r, c) - z1(r, c);
-      }
-    }
-    Ec /= (double)_batchsize;
-    VLOG(30) << "E[c]:";
-    VLOG(30) << Ec;
+    Ec = (z1.colMean() - z2.colMean());
+    Ec.transpose();
+    VLOG(60) << "E[c]:";
+    VLOG(60) << Ec;
 
-    EW = z1 * ABatch.T() - z2 * Agenerated.T();
-    VLOG(30) << "E[W]:";
-    VLOG(30) << EW;
+    EW = z1 * ABatch.T() - z2 * ABinary.T();
+    VLOG(60) << "E[W]:";
+    VLOG(60) << EW;
 
     EV = z1 * SBatch.T() - z2 * SBatch.T();
-    VLOG(30) << "E[V]:";
-    VLOG(30) << EV;
+    VLOG(60) << "E[V]:";
+    VLOG(60) << EV;
 
     tmp = _alpha * Eb;
     _crbm->changeb(tmp);
-    VLOG(30) << "New b:";
-    VLOG(30) << _crbm->b();
+    VLOG(60) << "New b:";
+    VLOG(60) << _crbm->b();
 
     tmp = _alpha * Ec;
     _crbm->changec(tmp);
-    VLOG(30) << "New c:";
-    VLOG(30) << _crbm->c();
+    VLOG(60) << "New c:";
+    VLOG(60) << _crbm->c();
 
     newW = _crbm->W() + _alpha * EW;
-    VLOG(30) << "New W:";
-    VLOG(30) << newW;
+    VLOG(60) << "New W:";
+    VLOG(60) << newW;
 
     newV = _crbm->V() + _alpha * EV;
-    VLOG(30) << "New V:";
-    VLOG(30) << newV;
+    VLOG(60) << "New V:";
+    VLOG(60) << newV;
 
     if(_momentum > 0.0)
     {
       tmp = (_alpha * _momentum) * _vb;
       _crbm->changeb(tmp);
-      VLOG(30) << "MOMENTUM new W:";
-      VLOG(30) << newW;
+      VLOG(60) << "MOMENTUM new W:";
+      VLOG(60) << newW;
       tmp = (_alpha * _momentum) * _vb;
       _crbm->changec(tmp);
-      VLOG(30) << "MOMENTUM new V:";
-      VLOG(30) << newV;
+      VLOG(60) << "MOMENTUM new V:";
+      VLOG(60) << newV;
       // newW = newW + _alpha * _momentum * _vW;
       // newV = newV + _alpha * _momentum * _vV;
 
       _vb = Eb;
-      VLOG(30) << "vb:";
-      VLOG(30) << _vb;
+      VLOG(60) << "vb:";
+      VLOG(60) << _vb;
       _vc = Ec;
-      VLOG(30) << "vc:";
-      VLOG(30) << _vc;
+      VLOG(60) << "vc:";
+      VLOG(60) << _vc;
       _vW = EW;
-      VLOG(30) << "vW:";
-      VLOG(30) << _vW;
+      VLOG(60) << "vW:";
+      VLOG(60) << _vW;
       _vV = EV;
-      VLOG(30) << "vV:";
-      VLOG(30) << _vV;
+      VLOG(60) << "vV:";
+      VLOG(60) << _vV;
     }
 
     if(_weightcost > 0.0)
     {
       newW = (1.0 - _weightcost) * newW;
-      VLOG(30) << "WEIGHT COST new W:";
-      VLOG(30) << newW;
+      VLOG(60) << "WEIGHT COST new W:";
+      VLOG(60) << newW;
       newV = (1.0 - _weightcost) * newV;
-      VLOG(30) << "WEIGHT COST new V:";
-      VLOG(30) << newV;
+      VLOG(60) << "WEIGHT COST new V:";
+      VLOG(60) << newV;
     }
 
     _crbm->setW(newW);
     _crbm->setV(newV);
 
-    if(_usePB) progressbar_inc(progress);
     if(i % 1000 == 0) CRBMIO::write(out, _crbm);
   }
-  if(_usePB) progressbar_finish(progress);
 
   CRBMIO::write(out, _crbm);
 }
 
-void CRBMTrainer::__randomAInit(Matrix& A)
+void CRBMTrainer::__randomABinary(Matrix& A)
 {
   for(int r = 0; r < A.rows(); r++)
   {

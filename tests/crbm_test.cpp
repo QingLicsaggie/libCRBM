@@ -1,6 +1,7 @@
 #include "crbm_test.h"
 
 #include <crbm/CRBM.h>
+#include <crbm/Random.h>
 
 #include <iostream>
 #include <string>
@@ -100,6 +101,7 @@ void crbmTest::testRandomInit()
 
 void crbmTest::testUp()
 {
+  Random::initialise();
   int n = 10;
   int m = 20;
   int k = 30;
@@ -111,9 +113,17 @@ void crbmTest::testUp()
   crbm->initInputBiasValues();
 
   Matrix y = crbm->y();
-  Matrix x = crbm->x();
-
+  Matrix x(n,1);
+  for(int i = 0; i < n; i++)
+  {
+    x(i,0) = Random::unit();
+  }
   crbm->up(y, x);
+  Matrix z = crbm->z();
+  for(int i = 0; i < m; i++)
+  {
+    CPPUNIT_ASSERT(z(i,0) == 0 || z(i,0) == 1);
+  }
 }
 
 void crbmTest::testDown()
@@ -129,8 +139,16 @@ void crbmTest::testDown()
   crbm->initInputBiasValues();
 
   Matrix z = crbm->z();
-
-  crbm->down(z);
+  Matrix x(n,1);
+  for(int i = 0; i < n; i++)
+  {
+    x(i,0) = Random::unit();
+  }
+  crbm->down(z,x);
+  for(int i = 0; i < n; i++)
+  {
+    CPPUNIT_ASSERT(x(i,0) == 0 || x(i,0) == 1);
+  }
 }
 
 void crbmTest::testGetSet()

@@ -67,16 +67,17 @@ void CRBMController::update(double* sensors, double* actuators)
     }
   }
 
+  // cout << _y << endl;
+
   _crbm->control(_y, _x);
 
   index = 0;
   for(int i = 0; i < _nrOfActuators; i++)
   {
-    actuators[i] = _d->doublearray2double(_tmpOutput);
     for(int j = 0; j < _unitsPerSenAct; j++)
     {
       _tmpOutput[j] = _x(index++,0);
     }
+    actuators[i] = _d->doublearray2double(_tmpOutput);
   }
 }
-

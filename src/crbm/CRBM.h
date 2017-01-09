@@ -18,7 +18,7 @@ namespace libcrbm
         void control(Matrix& x, Matrix& y);
 
         void up(Matrix& y, Matrix& x);
-        void down(Matrix& z);
+        void down(Matrix& z, Matrix& x);
 
         void initRandomWeights(double w = 0.01);
         void initInputBiasValues(double b = 0.01);
@@ -49,7 +49,6 @@ namespace libcrbm
         void setb(Matrix& b);
         void setc(Matrix& c);
 
-        const Matrix& x() { return _x; }
         const Matrix& y() { return _y; }
         const Matrix& z() { return _z; }
         void  initLearning(int n);
@@ -73,9 +72,9 @@ namespace libcrbm
         Matrix _b;            // bias values for output
         Matrix _c;            // bias values for hidden
 
-        Matrix _x;            // input
-        Matrix _y;            // hidden
-        Matrix _z;            // output
+        // Matrix _x;
+        Matrix _y;
+        Matrix _z;
 
         bool _learningInitialised;
 

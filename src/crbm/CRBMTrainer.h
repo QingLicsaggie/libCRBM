@@ -34,7 +34,7 @@ namespace libcrbm
 
       private:
         void   __copy(Matrix& dst, const Matrix& src, int index);
-        void   __randomAInit(Matrix& a);
+        void   __randomABinary(Matrix& a);
 
         int    _bins;
         int    _batchsize;     // size of training data batches

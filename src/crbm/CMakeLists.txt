@@ -8,8 +8,6 @@ set(SRC
   CRBMTrainer.cpp
   Random.cpp
   Discretiser.cpp
-
-  ext/progressbar.c
 )
 
 if(APPLE)

@@ -16,7 +16,7 @@ using namespace libcrbm::binary;
 
 CRBM::CRBM(int k, int m, int n, int u, int bins)
   :  _W(m,n),  _V(m,k), _b(n,1), _c(m,1),
-     _Wt(n,m), _x(n,1), _y(k,1), _z(m,1)
+     _Wt(n,m), _y(k,1), _z(m,1)
 {
   _k                   = k;
   _m                   = m;
@@ -63,8 +63,8 @@ void CRBM::learn(Matrix& y, Matrix& x)
   up(y,x);
   for(int i = 0; i < _uditerations; i++)
   {
-    down(_z);
-    up(y, _x);
+    down(_z, x);
+    up(y, x);
   }
 }
 
@@ -73,10 +73,10 @@ void CRBM::control(Matrix& y, Matrix& x)
   up(y,x);
   for(int i = 0; i < _uditerations-1; i++)
   {
-    down(_z);
-    up(y, _x);
+    down(_z, x);
+    up(y, x);
   }
-  down(_z);
+  down(_z, x);
 }
 
 void CRBM::up(Matrix& y, Matrix& x)
@@ -99,20 +99,23 @@ void CRBM::up(Matrix& y, Matrix& x)
   {
     for(int c = 0; c < _z.cols(); c++)
     {
-      _z(r,c) = (Random::unit() > __sigm(_z(r,c)))?1.0:0.0;
+      _z(r,c) = (Random::unit() < __sigm(_z(r,c)))?1.0:0.0;
     }
   }
 }
 
-void CRBM::down(Matrix& z)
+void CRBM::down(Matrix& z, Matrix &x)
 {
   // cout << "down" << endl;
   // cout << "Wt:" << _Wt << endl;
   // cout << "z:" <<  z << endl;
-  _x = _b + _Wt * z;
-  for(int i = 0; i < _n; i++)
+  x = _b + _Wt * z;
+  for(int r = 0; r < x.rows(); r++)
   {
-    _x(i, 0) = (Random::unit() > __sigm(_x(i, 0)))?1.0:0.0;
+    for(int c = 0; c < x.cols(); c++)
+    {
+      x(r, c) = (Random::unit() < __sigm(x(r, c)))?1.0:0.0;
+    }
   }
 }
 
