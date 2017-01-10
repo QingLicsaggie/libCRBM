@@ -13,8 +13,9 @@ using namespace std;
 DEFINE_string(S,  "",    "sensor file (CSV)");
 DEFINE_string(C,  "",    "CRBM");
 DEFINE_string(o,  "",    "output");
-DEFINE_int64(ns, -1, "nr. of sensors");
-DEFINE_int64(na, -1, "nr. of actuators");
+DEFINE_int64(ns,  -1,    "nr. of sensors");
+DEFINE_int64(na,  -1,    "nr. of actuators");
+DEFINE_int64(n,   -1,    "nr. of iterations");
 DEFINE_bool(lerr, false, "also log to stderr");
 
 int main(int argc, char** argv)
@@ -32,7 +33,9 @@ int main(int argc, char** argv)
 
   ofstream log(FLAGS_o.c_str());
 
-  for(int i = 0; i < sensorData->rows(); i++)
+  int iterations = sensorData->rows();
+  if(FLAGS_n > 0) iterations = FLAGS_n;
+  for(int i = 0; i < iterations; i++)
   {
     for(int s = 0; s < FLAGS_ns; s++)
     {

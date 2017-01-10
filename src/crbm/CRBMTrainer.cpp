@@ -40,30 +40,11 @@ CRBMTrainer::~CRBMTrainer()
 void CRBMTrainer::train(string inputFilename, string outputFilename, string out, int m)
 {
   VLOG(10) << "Using " << m << " hidden units.";
+  VLOG(10) << "Using perturbation with " << _pertubation;
   VLOG(10) << "reading S-file: " << inputFilename;
   entropy::DContainer* input  = entropy::Csv::read(inputFilename);
   VLOG(20) << "Sensors:   " << endl << *input;
   if(VLOG_IS_ON(30)) entropy::Csv::write("s.csv", input);
-
-  if(_pertubation > 0.0)
-  {
-    VLOG(10) << "Using perturbation with " << _pertubation;
-    std::default_random_engine generator;
-    std::normal_distribution<double> distribution(0.0, _pertubation);
-    for(int r = 0; r < input->rows(); r++)
-    {
-      for(int c = 0; c < input->columns(); c++)
-      {
-        double number = distribution(generator);
-        double v      = input->get(r,c);
-        double w      = v + number;
-        if(w >  1.0) w =  1.0;
-        if(w < -1.0) w = -1.0;
-        VLOG(100) << "changing " << r << ", " << c << " = "  << v << " -> " << w;
-        input->set(r,c,w);
-      }
-    }
-  }
 
   VLOG(10) << "reading A-file: " << outputFilename;
   entropy::DContainer* output = entropy::Csv::read(outputFilename);
@@ -212,6 +193,26 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     int dataStartIndex = Random::rand(0, length - _batchsize);
     VLOG(10) << "Start index " << dataStartIndex;
     __copy(SBatch, S, dataStartIndex);
+
+    if(_pertubation > 0.0)
+    {
+      std::default_random_engine generator;
+      std::normal_distribution<double> distribution(0.0, _pertubation);
+      for(int r = 0; r < SBatch.rows(); r++)
+      {
+        for(int c = 0; c < SBatch.cols(); c++)
+        {
+          double number = distribution(generator);
+          double v      = SBatch(r,c);
+          double w      = v + number;
+          if(w >  1.0) w =  1.0;
+          if(w < -1.0) w = -1.0;
+          VLOG(100) << "changing " << r << ", " << c << " = "  << v << " -> " << w;
+          SBatch(r,c) = w;
+        }
+      }
+    }
+
     VLOG(50) << "SBatch:";
     VLOG(50) << SBatch;
     __copy(ABatch, A, dataStartIndex);
@@ -311,7 +312,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     _crbm->setW(newW);
     _crbm->setV(newV);
 
-    if(i % 1000 == 0) CRBMIO::write(out, _crbm);
+    if(i % 500 == 0) CRBMIO::write(out, _crbm);
   }
 
   CRBMIO::write(out, _crbm);
