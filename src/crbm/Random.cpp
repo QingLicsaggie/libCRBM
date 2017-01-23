@@ -35,9 +35,26 @@ double Random::unit()
   return drand48();
 }
 
-void Random::initialise(int seed)
+void Random::initialise(int seed, bool verbose)
 {
-  srand(seed);
+  srand48(seed);
+
+  if(verbose)
+  {
+    cout << "random initialised:";
+    for(int i = 0; i < 10; i++)
+    {
+      cout << " " << rand(0, 100);
+    }
+    cout << endl;
+    cout << "random initialised:";
+    for(int i = 0; i < 10; i++)
+    {
+      cout << " " << unit();
+    }
+    cout << endl;
+  }
+
 }
 
 int Random::randi(int min, int max)

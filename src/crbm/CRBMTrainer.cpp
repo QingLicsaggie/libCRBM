@@ -19,7 +19,7 @@ CRBMTrainer::CRBMTrainer(int    bins,
                          double alpha,
                          double momentum,
                          double weightcost,
-                         double pertubation)
+                         double perturbation)
 {
   _bins          = bins;
   _uditerations  = uditerations;
@@ -28,9 +28,10 @@ CRBMTrainer::CRBMTrainer(int    bins,
   _alpha         = alpha;
   _momentum      = momentum;
   _weightcost    = weightcost;
-  _pertubation   = pertubation;
+  _perturbation  = perturbation;
   _unitPerSenAct = (int)ceil(log2(_bins));
   _usePB         = true;
+  Random::initialise();
 }
 
 CRBMTrainer::~CRBMTrainer()
@@ -40,7 +41,7 @@ CRBMTrainer::~CRBMTrainer()
 void CRBMTrainer::train(string inputFilename, string outputFilename, string out, int m)
 {
   VLOG(10) << "Using " << m << " hidden units.";
-  VLOG(10) << "Using perturbation with " << _pertubation;
+  VLOG(10) << "Using perturbation with " << _perturbation;
   VLOG(10) << "reading S-file: " << inputFilename;
   entropy::DContainer* input  = entropy::Csv::read(inputFilename);
   VLOG(20) << "Sensors:   " << endl << *input;
@@ -194,10 +195,10 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(10) << "Start index " << dataStartIndex;
     __copy(SBatch, S, dataStartIndex);
 
-    if(_pertubation > 0.0)
+    if(_perturbation > 0.0)
     {
       std::default_random_engine generator;
-      std::normal_distribution<double> distribution(0.0, _pertubation);
+      std::normal_distribution<double> distribution(0.0, _perturbation);
       for(int r = 0; r < SBatch.rows(); r++)
       {
         for(int c = 0; c < SBatch.cols(); c++)
@@ -226,7 +227,6 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     Matrix z1 = _crbm->z();
     VLOG(200) << "Z1:";
     VLOG(200) << z1;
-    // cout << "z1:" << endl << z1 << endl;
     _crbm->learn(SBatch, ABinary);
     Matrix z2 = _crbm->z();
     VLOG(200) << "Z2:";

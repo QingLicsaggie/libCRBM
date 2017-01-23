@@ -25,7 +25,7 @@ namespace libcrbm
                     double alpha,
                     double momentum,
                     double weightcost,
-                    double pertubation);
+                    double perturbation);
 
         ~CRBMTrainer();
 
@@ -43,7 +43,7 @@ namespace libcrbm
         int    _uditerations;  // nr of up-down iterations
         double _alpha;         // learning rate
         double _momentum;      // contribution of the previous gradient
-        double _pertubation;   // add randomness to the data
+        double _perturbation;  // add randomness to the data
         double _weightcost;    // weight cost for L2
 
         int    _nrOfSensors;

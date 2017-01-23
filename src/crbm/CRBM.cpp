@@ -23,8 +23,6 @@ CRBM::CRBM(int k, int m, int n, int u, int bins)
   _n            = n;
   _uditerations = u;
   _bins         = bins;
-
-  Random::initialise();
 }
 
 CRBM::~CRBM()

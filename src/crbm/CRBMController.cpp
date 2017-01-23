@@ -1,6 +1,7 @@
 #include <crbm/CRBMController.h>
 
 #include <crbm/Discretiser.h>
+#include <crbm/Random.h>
 
 #include <math.h>
 
@@ -25,6 +26,8 @@ CRBMController::CRBMController(int bins, int nrOfSensors, int nrOfActuators, int
 
   _tmpInput        = new double[_unitsPerSenAct];
   _tmpOutput       = new double[_unitsPerSenAct];
+
+  Random::initialise();
 }
 
 CRBMController::CRBMController(string filename)
