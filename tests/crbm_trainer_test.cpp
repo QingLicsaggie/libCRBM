@@ -453,41 +453,44 @@ void crbmTrainerTest::testTrain()
     }
 
 
-    // TEST Z
+    Eb = (ABatch.rowMean() - ABinary.rowMean());
+    Ec = (z1.rowMean()   - z2.rowMean());
+    EW = z1 * ABatch.T() - z2 * ABinary.T();
+    EV = z1 * SBatch.T() - z2 * SBatch.T();
+    tmp = alpha * Eb;
+    crbm->changeb(tmp);
+    tmp = alpha * Ec;
+    crbm->changec(tmp);
+    newW = crbm->W() + alpha * EW;
+    newV = crbm->V() + alpha * EV;
 
-    // Eb = (ABatch.rowMean() - ABinary.rowMean());
-    // Ec = (z1.rowMean()   - z2.rowMean());
-    // EW = z1 * ABatch.T() - z2 * ABinary.T();
-    // EV = z1 * SBatch.T() - z2 * SBatch.T();
-    // tmp = alpha * Eb;
-    // crbm->changeb(tmp);
-    // tmp = alpha * Ec;
-    // crbm->changec(tmp);
-    // newW = crbm->W() + alpha * EW;
-    // newV = crbm->V() + alpha * EV;
+    if(momentum > 0.0)
+    {
+      tmp = (alpha * momentum) * vb;
+      crbm->changeb(tmp);
+      tmp = (alpha * momentum) * vc;
+      crbm->changec(tmp);
+      newW = newW + alpha * momentum * vW;
+      newV = newV + alpha * momentum * vV;
 
-    // if(momentum > 0.0)
-    // {
-      // tmp = (alpha * momentum) * vb;
-      // crbm->changeb(tmp);
-      // tmp = (alpha * momentum) * vc;
-      // crbm->changec(tmp);
-      // newW = newW + alpha * momentum * vW;
-      // newV = newV + alpha * momentum * vV;
+      vb = Eb;
+      vc = Ec;
+      vW = EW;
+      vV = EV;
+    }
 
-      // vb = Eb;
-      // vc = Ec;
-      // vW = EW;
-      // vV = EV;
-    // }
+    if(weightcost > 0.0)
+    {
+      newW = (1.0 - weightcost) * newW;
+      newV = (1.0 - weightcost) * newV;
+    }
 
-    // if(weightcost > 0.0)
-    // {
-      // newW = (1.0 - weightcost) * newW;
-      // newV = (1.0 - weightcost) * newV;
-    // }
+    crbm->setW(newW);
+    crbm->setV(newV);
 
-    // crbm->setW(newW);
-    // crbm->setV(newV);
+    W = newW;
+    V = newV;
+    bl = crbm->b();
+    cl = crbm->c();
   }
 }
