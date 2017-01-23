@@ -89,4 +89,8 @@ void crbmioTest::testIO()
     }
   }
 
+  CPPUNIT_ASSERT_EQUAL(crbm->uditerations(), test->uditerations());
+  CPPUNIT_ASSERT_EQUAL(crbm->n(),            test->n());
+  CPPUNIT_ASSERT_EQUAL(crbm->m(),            test->m());
+  CPPUNIT_ASSERT_EQUAL(crbm->k(),            test->k());
 }

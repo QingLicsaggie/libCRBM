@@ -15,22 +15,20 @@ using namespace libcrbm::binary;
 // n - output
 
 CRBM::CRBM(int k, int m, int n, int u, int bins)
-  :  _W(m,n),  _V(m,k), _b(n,1), _c(m,1),
-     _Wt(n,m), _y(k,1), _z(m,1)
+  :  _W(m,n), _V(m,k), _Wt(n,m),
+     _b(n,1), _c(m,1), _z(m,1)
 {
-  _k                   = k;
-  _m                   = m;
-  _n                   = n;
-  _uditerations        = u;
-  _bins                = bins;
-  _learningInitialised = false;
+  _k            = k;
+  _m            = m;
+  _n            = n;
+  _uditerations = u;
+  _bins         = bins;
 
   Random::initialise();
 }
 
 CRBM::~CRBM()
-{
-}
+{ }
 
 void CRBM::initLearning(int n)
 {
@@ -52,10 +50,8 @@ void CRBM::initLearning(int n)
       ctmp(r,c) = _c(r,0);
     }
   }
-
   _b = btmp;
   _c = ctmp;
-
 }
 
 void CRBM::learn(Matrix& y, Matrix& x)
@@ -94,7 +90,10 @@ void CRBM::up(Matrix& y, Matrix& x)
   // cout << "c:" << _c << endl;
   // cout << "z:" << _z << endl;
 
+  // cout << "size(y) " << y.rows() << ", " << y.cols() << endl;
+
   _z = _c + _V * y + _W * x;
+
   for(int r = 0; r < _z.rows(); r++)
   {
     for(int c = 0; c < _z.cols(); c++)
@@ -109,6 +108,8 @@ void CRBM::down(Matrix& z, Matrix &x)
   // cout << "down" << endl;
   // cout << "Wt:" << _Wt << endl;
   // cout << "z:" <<  z << endl;
+  // cout << "size b: " << _b.rows() << ", " << _b.cols() << " _Wt: " << _Wt.rows() << ", " << _Wt.cols() << " z.T: " << z.cols() << ", " << z.rows() << endl;
+
   x = _b + _Wt * z;
   for(int r = 0; r < x.rows(); r++)
   {
@@ -131,6 +132,8 @@ void CRBM::initRandomWeights(double w)
       _W(r,c) = distribution(generator);
     }
   }
+
+  _Wt = _W.T();
 
   for(int r = 0; r < _V.rows(); r++)
   {
@@ -161,7 +164,6 @@ void CRBM::initHiddenBiasValues(double c)
   {
     _c(r,0) = distribution(generator);
   }
-
 }
 
 double CRBM::__sigm(double v)

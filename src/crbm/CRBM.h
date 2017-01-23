@@ -49,7 +49,6 @@ namespace libcrbm
         void setb(Matrix& b);
         void setc(Matrix& c);
 
-        const Matrix& y() { return _y; }
         const Matrix& z() { return _z; }
         void  initLearning(int n);
 
@@ -72,12 +71,7 @@ namespace libcrbm
         Matrix _b;            // bias values for output
         Matrix _c;            // bias values for hidden
 
-        // Matrix _x;
-        Matrix _y;
         Matrix _z;
-
-        bool _learningInitialised;
-
     };
   }
 }

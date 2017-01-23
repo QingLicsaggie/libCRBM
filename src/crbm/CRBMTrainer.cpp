@@ -164,9 +164,9 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   VLOG(40) << "A Matrix" << endl << A;
 
   VLOG(10) << "Batch size: " << _batchsize;
-  Matrix SBatch(S.cols(), _batchsize);
-  Matrix ABatch(A.cols(), _batchsize);
-  Matrix ABinary(A.cols(),  _batchsize);
+  Matrix SBatch(S.cols(),  _batchsize);
+  Matrix ABatch(A.cols(),  _batchsize);
+  Matrix ABinary(A.cols(), _batchsize);
 
   Matrix Eb(n,1);
   Matrix Ec(m,1);
@@ -246,10 +246,12 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(60) << Ec;
 
     EW = z1 * ABatch.T() - z2 * ABinary.T();
+    // EW /= (float)_numepochs;
     VLOG(60) << "E[W]:";
     VLOG(60) << EW;
 
     EV = z1 * SBatch.T() - z2 * SBatch.T();
+    // EV /= (float)_numepochs;
     VLOG(60) << "E[V]:";
     VLOG(60) << EV;
 
@@ -282,8 +284,8 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
       _crbm->changec(tmp);
       VLOG(60) << "MOMENTUM new V:";
       VLOG(60) << newV;
-      // newW = newW + _alpha * _momentum * _vW;
-      // newV = newV + _alpha * _momentum * _vV;
+      newW = newW + _alpha * _momentum * _vW;
+      newV = newV + _alpha * _momentum * _vV;
 
       _vb = Eb;
       VLOG(60) << "vb:";
@@ -312,7 +314,11 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     _crbm->setW(newW);
     _crbm->setV(newV);
 
-    if(i % 500 == 0) CRBMIO::write(out, _crbm);
+    if(i % 500 == 0)
+    {
+      VLOG(1) << "writing crbm after " << i << " iterations.";
+      CRBMIO::write(out, _crbm);
+    }
   }
 
   CRBMIO::write(out, _crbm);

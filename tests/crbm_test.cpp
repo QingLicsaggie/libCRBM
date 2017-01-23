@@ -101,7 +101,8 @@ void crbmTest::testRandomInit()
 
 void crbmTest::testUp()
 {
-  Random::initialise();
+  Random::initialise(false);
+
   int n = 10;
   int m = 20;
   int k = 30;
@@ -112,7 +113,7 @@ void crbmTest::testUp()
   crbm->initHiddenBiasValues();
   crbm->initInputBiasValues();
 
-  Matrix y = crbm->y();
+  Matrix y(k,1);
   Matrix x(n,1);
   for(int i = 0; i < n; i++)
   {
@@ -144,6 +145,7 @@ void crbmTest::testDown()
   {
     x(i,0) = Random::unit();
   }
+  cout << "z: " << z.rows() << ", " << z.cols() << endl;
   crbm->down(z,x);
   for(int i = 0; i < n; i++)
   {
@@ -238,6 +240,56 @@ void crbmTest::testGetSet()
     CPPUNIT_ASSERT_DOUBLES_EQUAL(index++, crbm->c(a), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(c(a,0),  crbm->c(a), 0.000001);
   }
+}
 
+void crbmTest::testTrain()
+{
+  int data_points   = 200;
+  int n             = 50;
+  double step_width = (double)n;
 
+  double sin_points[n+1];
+  double cos_points[n+1];
+
+  double** S = new double*[data_points];
+  for(int i = 0; i < data_points; i++)
+  {
+    S[i] = new double[12];
+  }
+
+  for(int i = 0; i < n+1; i++)
+  {
+    sin_points[i] = sin(-M_PI + (double)i * 2.0 * M_PI/step_width);
+    cos_points[i] = cos(-M_PI + (double)i * 2.0 * M_PI/step_width);
+  }
+
+  for(int i = 0; i < data_points; i++)
+  {
+    int j = (i + n) % (n+1);
+    int k = ((int)(i + 1.5 * ((double)n))) % (n+1);
+
+    S[i][0 ] = sin_points[j];
+    S[i][1 ] = cos_points[j];
+    S[i][2 ] = sin_points[k];
+    S[i][3 ] = cos_points[k];
+    S[i][4 ] = sin_points[k];
+    S[i][5 ] = cos_points[k];
+    S[i][6 ] = sin_points[j];
+    S[i][7 ] = cos_points[j];
+    S[i][8 ] = sin_points[j];
+    S[i][9 ] = cos_points[j];
+    S[i][10] = sin_points[k];
+    S[i][11] = cos_points[k];
+
+  }
+
+  cout << endl << endl;
+  for(int i = 0; i < data_points; i++)
+  {
+    for(int j = 0; j < 11; j++)
+    {
+      cout << S[i][j] << ",";
+    }
+    cout << S[i][11] << endl;
+  }
 }

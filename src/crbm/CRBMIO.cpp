@@ -20,6 +20,8 @@ void CRBMIO::write(string filename, CRBM *crbm)
   for(int i = 0; i < crbm->m(); i++) c(i, 0) = crbm->c(i);
   ofstream output;
   output.open(filename, std::ofstream::trunc);
+  output.precision(10);
+  output.setf(ios::fixed,ios::floatfield);
   output << "k,n,m,u,b: "
     << crbm->k() << ","
     << crbm->n() << ","

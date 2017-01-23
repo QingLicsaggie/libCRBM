@@ -1,7 +1,10 @@
 #include <crbm/CRBMTrainer.h>
+#include <crbm/Random.h>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+
+#include <sstream>
 
 DEFINE_string(S,  "",    "sensor file (CSV)");
 DEFINE_string(A,  "",    "actuator file (CSV)");
@@ -25,6 +28,25 @@ int main(int argc, char** argv)
   google::InitGoogleLogging(argv[0]);
   if(FLAGS_lerr == true) FLAGS_alsologtostderr = 1;
   FLAGS_log_dir = ".";
+
+  Random::initialise();
+  if(VLOG_IS_ON(1))
+  {
+    std::stringstream sst;
+    sst << "Int:";
+    for(int i = 0; i < 10; i++)
+    {
+      sst << " " << Random::randi(0,100);
+    }
+    sst << endl;
+    sst << "Unit:";
+    for(int i = 0; i < 10; i++)
+    {
+      sst << " " << Random::unit();
+    }
+
+    VLOG(1) << sst.str();
+  }
 
   CRBMTrainer* trainer = new CRBMTrainer(FLAGS_b,
                                          FLAGS_ud,
