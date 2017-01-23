@@ -54,7 +54,7 @@ void CRBM::initLearning(int n)
 
 void CRBM::learn(Matrix& y, Matrix& x)
 {
-  up(y,x);
+  // up(y,x);
   for(int i = 0; i < _uditerations; i++)
   {
     down(_z, x);
@@ -96,7 +96,9 @@ void CRBM::up(Matrix& y, Matrix& x)
   {
     for(int c = 0; c < _z.cols(); c++)
     {
-      _z(r,c) = (Random::unit() < __sigm(_z(r,c)))?1.0:0.0;
+      double rand = Random::unit();
+      // cout << "crbm-up: " << rand << endl;
+      _z(r,c) = (rand < __sigm(_z(r,c)))?1.0:0.0;
     }
   }
 }
@@ -113,7 +115,9 @@ void CRBM::down(Matrix& z, Matrix &x)
   {
     for(int c = 0; c < x.cols(); c++)
     {
-      x(r, c) = (Random::unit() < __sigm(x(r, c)))?1.0:0.0;
+      double rand = Random::unit();
+      // cout << "crbm-down: " << rand << endl;
+      x(r, c) = (rand < __sigm(x(r, c)))?1.0:0.0;
     }
   }
 }

@@ -246,12 +246,12 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(60) << Ec;
 
     EW = z1 * ABatch.T() - z2 * ABinary.T();
-    // EW /= (float)_numepochs;
+    EW /= (float)_batchsize;
     VLOG(60) << "E[W]:";
     VLOG(60) << EW;
 
     EV = z1 * SBatch.T() - z2 * SBatch.T();
-    // EV /= (float)_numepochs;
+    EV /= (float)_batchsize;
     VLOG(60) << "E[V]:";
     VLOG(60) << EV;
 

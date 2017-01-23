@@ -96,9 +96,9 @@ void crbmTrainerTest::testTrain()
   int    bs           = 1;
   int    m            = 10;
   double alpha        = 1.0;
-  double momentum     = 0.0;
-  double weightcost   = 0.0;
-  double perturbation = 0.0;
+  double momentum     = -1.0;
+  double weightcost   = -1.0;
+  double perturbation = -1.0;
 
 
   Sraw.setBinSizes(bins);
@@ -356,8 +356,16 @@ void crbmTrainerTest::testTrain()
 
   for(int i = 0; i < ne; i++)
   {
-    int dataStartIndex = Random::rand(0, length - bs);
+    int dataStartIndex = i;
     __copy(SBatch, S, dataStartIndex);
+
+    for(int row = 0; row < bs; row++)
+    {
+      for(int col = 0; col < 12*4; col++)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(SBatch(col, row), S(row+i, col), 0.000001);
+      }
+    }
 
     // if(perturbation > 0.0)
     // {
@@ -378,6 +386,13 @@ void crbmTrainerTest::testTrain()
     // }
 
     __copy(ABatch, A, dataStartIndex);
+    for(int row = 0; row < bs; row++)
+    {
+      for(int col = 0; col < 12*4; col++)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(ABatch(col, row), A(row+i, col), 0.000001);
+      }
+    }
 
     for(int row = 0; row < ABinary.rows(); row++)
     {
@@ -391,7 +406,7 @@ void crbmTrainerTest::testTrain()
     crbm->up(SBatch, ABatch);
     Matrix z1 = crbm->z();
 
-    // TEST Z
+    // TEST up: crbm->up(SBatch, ABatch);
     Matrix z = cl + V * SBatch + W * ABatch;
 
     Random::initialise(100 + i);
@@ -399,7 +414,9 @@ void crbmTrainerTest::testTrain()
     {
       for(int col = 0; col < z.cols(); col++)
       {
-        z(r,col) = (Random::unit() < __sigm(z(r,col)))?1.0:0.0;
+        double rand = Random::unit();
+        // cout << "up: " << rand << endl;
+        z(r,col) = (rand < __sigm(z(r,col)))?1.0:0.0;
         CPPUNIT_ASSERT_EQUAL(z1(r,col), z(r,col));
       }
     }
@@ -411,39 +428,39 @@ void crbmTrainerTest::testTrain()
     Random::initialise(200 + i);
     Matrix y = SBatch;
     Matrix x = ABinary;
-    // up
-    z = cl + V * SBatch + W * ABatch;
-
-    for(int r = 0; r < z.rows(); r++)
-    {
-      for(int col = 0; col < z.cols(); col++)
-      {
-        z(r,col) = (Random::unit() < __sigm(z(r,col)))?1.0:0.0;
-      }
-    }
 
     for(int u = 0; u < uditer; u++)
     {
       // down
       x = bl + Wt * z;
+      CPPUNIT_ASSERT_EQUAL(bs, x.cols());
+      CPPUNIT_ASSERT_EQUAL(n,  x.rows());
+
       for(int r = 0; r < x.rows(); r++)
       {
         for(int c = 0; c < x.cols(); c++)
         {
-          x(r, c) = (Random::unit() < __sigm(x(r, c)))?1.0:0.0;
+          double rand = Random::unit();
+          // cout << "down: " << rand << endl;
+          x(r, c) = (rand < __sigm(x(r, c)))?1.0:0.0;
         }
       }
 
       // up
       z = cl + V * y + W * x;
+      CPPUNIT_ASSERT_EQUAL(bs, z.cols());
+      CPPUNIT_ASSERT_EQUAL(m,  z.rows());
       for(int r = 0; r < z.rows(); r++)
       {
         for(int col = 0; col < z.cols(); col++)
         {
-          z(r,col) = (Random::unit() < __sigm(z(r,col)))?1.0:0.0;
+          double rand = Random::unit();
+          // cout << "up: " << rand << endl;
+          z(r,col) = (rand < __sigm(z(r,col)))?1.0:0.0;
         }
       }
     }
+
     for(int r = 0; r < z.rows(); r++)
     {
       for(int col = 0; col < z.cols(); col++)
@@ -452,15 +469,36 @@ void crbmTrainerTest::testTrain()
       }
     }
 
-
     Eb = (ABatch.rowMean() - ABinary.rowMean());
     Ec = (z1.rowMean()   - z2.rowMean());
     EW = z1 * ABatch.T() - z2 * ABinary.T();
     EV = z1 * SBatch.T() - z2 * SBatch.T();
+    EW /= (double)(bs);
+    EV /= (double)(bs);
+
     tmp = alpha * Eb;
     crbm->changeb(tmp);
+    for(int r = 0; r < bl.rows(); r++)
+    {
+      for(int col = 0; col < bl.cols(); col++)
+      {
+        bl(r,col) += tmp(r,0);
+      }
+    }
+    CPPUNIT_ASSERT_EQUAL(bl, crbm->b());
+
     tmp = alpha * Ec;
     crbm->changec(tmp);
+    for(int r = 0; r < cl.rows(); r++)
+    {
+      for(int col = 0; col < cl.cols(); col++)
+      {
+        cl(r,col) += tmp(r,0);
+      }
+    }
+
+    CPPUNIT_ASSERT_EQUAL(cl, crbm->c());
+
     newW = crbm->W() + alpha * EW;
     newV = crbm->V() + alpha * EV;
 
@@ -488,9 +526,24 @@ void crbmTrainerTest::testTrain()
     crbm->setW(newW);
     crbm->setV(newV);
 
-    W = newW;
-    V = newV;
-    bl = crbm->b();
-    cl = crbm->c();
+    W  = newW;
+    V  = newV;
+    Wt = W.T();
+
+    for(int row = 0; row < W.rows(); row++)
+    {
+      for(int col = 0; col < W.cols(); col++)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(W(row, col), crbm->W()(row, col), 0.000001);
+      }
+    }
+
+    for(int row = 0; row < V.rows(); row++)
+    {
+      for(int col = 0; col < V.cols(); col++)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(V(row, col), crbm->V()(row, col), 0.000001);
+      }
+    }
   }
 }
