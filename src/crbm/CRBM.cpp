@@ -54,7 +54,7 @@ void CRBM::initLearning(int n)
 
 void CRBM::learn(Matrix& y, Matrix& x)
 {
-  // up(y,x);
+  up(y,x);
   for(int i = 0; i < _uditerations; i++)
   {
     down(_z, x);

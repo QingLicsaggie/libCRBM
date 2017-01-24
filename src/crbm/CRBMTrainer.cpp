@@ -58,11 +58,11 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   output->setBinSizes(_bins);
   output->setDomains(-1.0, 1.0);
 
-  entropy::ULContainer* ic = input->discretiseByColumn();
+  entropy::ULContainer* ic = input->discretiseByColumn(false);
   VLOG(20) << "Binned Sensors:   " << endl << *ic;
   if(VLOG_IS_ON(30)) entropy::Csv::write("ds.csv", ic);
 
-  entropy::ULContainer* oc = output->discretiseByColumn();
+  entropy::ULContainer* oc = output->discretiseByColumn(false);
   VLOG(20) << "Binned Actuators: " << endl << *oc;
   if(VLOG_IS_ON(30)) entropy::Csv::write("da.csv", oc);
 
@@ -167,7 +167,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   VLOG(10) << "Batch size: " << _batchsize;
   Matrix SBatch(S.cols(),  _batchsize);
   Matrix ABatch(A.cols(),  _batchsize);
-  Matrix ABinary(A.cols(), _batchsize);
+  Matrix X(A.cols(), _batchsize);
 
   Matrix Eb(n,1);
   Matrix Ec(m,1);
@@ -219,22 +219,22 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     __copy(ABatch, A, dataStartIndex);
     VLOG(50) << "ABatch:";
     VLOG(50) << ABatch;
-    __randomABinary(ABinary);
+    __randomABinary(X);
     VLOG(50) << "A Random initial value:";
-    VLOG(50) << ABinary;
+    VLOG(50) << X;
 
     _crbm->up(SBatch, ABatch);
     Matrix z1 = _crbm->z();
     VLOG(200) << "Z1:";
     VLOG(200) << z1;
-    _crbm->learn(SBatch, ABinary);
+    _crbm->learn(SBatch, X);
     Matrix z2 = _crbm->z();
     VLOG(200) << "Z2:";
     VLOG(200) << z2;
     VLOG(30) << "A generated:";
-    VLOG(30) << ABinary;
+    VLOG(30) << X;
 
-    Eb = (ABatch.rowMean() - ABinary.rowMean());
+    Eb = (ABatch.rowMean() - X.rowMean());
     // Eb.transpose();
     VLOG(60) << "E[b]:";
     VLOG(60) << Eb;
@@ -245,7 +245,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(60) << "E[c]:";
     VLOG(60) << Ec;
 
-    EW = z1 * ABatch.T() - z2 * ABinary.T();
+    EW = z1 * ABatch.T() - z2 * X.T();
     EW /= (float)_batchsize;
     VLOG(60) << "E[W]:";
     VLOG(60) << EW;

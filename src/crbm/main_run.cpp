@@ -6,7 +6,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include <fstream> 
+#include <fstream>
 
 using namespace std;
 

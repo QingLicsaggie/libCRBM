@@ -74,30 +74,30 @@ void crbmTrainerTest::testTrain()
     Sraw << sin_points[k];
     Sraw << cos_points[k];
 
-    Araw << sin_points[m];
-    Araw << cos_points[m];
-    Araw << sin_points[k];
-    Araw << cos_points[k];
-    Araw << sin_points[k];
-    Araw << cos_points[k];
+    Araw << sin_points[l];
+    Araw << cos_points[l];
     Araw << sin_points[m];
     Araw << cos_points[m];
     Araw << sin_points[m];
     Araw << cos_points[m];
-    Araw << sin_points[k];
-    Araw << cos_points[k];
+    Araw << sin_points[l];
+    Araw << cos_points[l];
+    Araw << sin_points[l];
+    Araw << cos_points[l];
+    Araw << sin_points[m];
+    Araw << cos_points[m];
   }
 
   // initialisation
 
   int    bins         = 16;
   int    uditer       = 1;
-  int    ne           = 5;
-  int    bs           = 1;
-  int    m            = 10;
+  int    ne           = 100;
+  int    bs           = 10;
+  int    m            = 70;
   double alpha        = 1.0;
-  double momentum     = -1.0;
-  double weightcost   = -1.0;
+  double momentum     = 0.01;
+  double weightcost   = 0.1;
   double perturbation = -1.0;
 
 
@@ -107,9 +107,15 @@ void crbmTrainerTest::testTrain()
   Araw.setBinSizes(bins);
   Araw.setDomains(-1.0, 1.0);
 
-  entropy::ULContainer* sc = Sraw.discretiseByColumn();
+  entropy::ULContainer* sc = Sraw.discretiseByColumn(false);
+  entropy::ULContainer* ac = Araw.discretiseByColumn(false);
+  // cout << Sraw << endl;
+  // cout << *sc << endl;
 
-  entropy::ULContainer* ac = Araw.discretiseByColumn();
+  for(int row = 0; row < sc->rows(); row++)
+  {
+    CPPUNIT_ASSERT(sc->rowSum(row) > 0.0);
+  }
 
   int nrOfSensors   = Sraw.columns();
   int nrOfActuators = Araw.columns();
@@ -259,6 +265,8 @@ void crbmTrainerTest::testTrain()
   CRBM* crbm = new CRBM(n, m, k, uditer, bins);
   crbm->initRandomWeights(0.01);
 
+  CPPUNIT_ASSERT_EQUAL(uditer, crbm->uditerations());
+
   Matrix W  = crbm->W();
   Matrix V  = crbm->V();
   Matrix c  = crbm->c();
@@ -316,36 +324,14 @@ void crbmTrainerTest::testTrain()
   Matrix ABatch(A.cols(),  bs);
   Matrix ABinary(A.cols(), bs);
 
-  Matrix Eb(n,1);
-  Matrix Ec(m,1);
-  Matrix EW(m,n);
-  Matrix EV(m,k);
-  Matrix newb(1,1);
-  Matrix newc(1,1);
-  Matrix newV(1,1);
-  Matrix newW(1,1);
-
   crbm->initLearning(bs);
 
   Matrix bl = crbm->b();
   Matrix cl = crbm->c();
 
-  for(int r = 0; r < bl.rows(); r++)
-  {
-    for(int c = 0; c < bl.cols(); c++)
-    {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(b(r,0), bl(r,c), 0.000001);
-    }
-  }
-
-  for(int r = 0; r < cl.rows(); r++)
-  {
-    for(int col = 0; col < cl.cols(); col++)
-    {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c(r,0), cl(r,col), 0.000001);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c(r,0), 0.0,       0.000001);
-    }
-  }
+  CPPUNIT_ASSERT_EQUAL(crbm->b(), bl);
+  CPPUNIT_ASSERT_EQUAL(crbm->c(), cl);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(c(0,0), 0.0, 0.000001);
 
   Matrix tmp(0,0);
 
@@ -356,12 +342,22 @@ void crbmTrainerTest::testTrain()
 
   for(int i = 0; i < ne; i++)
   {
+
+    Matrix Eb(n,1);
+    Matrix Ec(m,1);
+    Matrix EW(m,n);
+    Matrix EV(m,k);
+    Matrix newb(1,1);
+    Matrix newc(1,1);
+    Matrix newV(1,1);
+    Matrix newW(1,1);
+
     int dataStartIndex = i;
     __copy(SBatch, S, dataStartIndex);
 
     for(int row = 0; row < bs; row++)
     {
-      for(int col = 0; col < 12*4; col++)
+      for(int col = 0; col < n; col++)
       {
         CPPUNIT_ASSERT_DOUBLES_EQUAL(SBatch(col, row), S(row+i, col), 0.000001);
       }
@@ -422,12 +418,27 @@ void crbmTrainerTest::testTrain()
     }
 
     Random::initialise(200 + i);
+    Matrix x = ABinary;
     crbm->learn(SBatch, ABinary);
     Matrix z2 = crbm->z();
+    CPPUNIT_ASSERT(x != ABinary);
 
     Random::initialise(200 + i);
     Matrix y = SBatch;
-    Matrix x = ABinary;
+
+    // up
+    z = cl + V * y + W * x;
+    CPPUNIT_ASSERT_EQUAL(bs, z.cols());
+    CPPUNIT_ASSERT_EQUAL(m,  z.rows());
+    for(int r = 0; r < z.rows(); r++)
+    {
+      for(int col = 0; col < z.cols(); col++)
+      {
+        double rand = Random::unit();
+        // cout << "up: " << rand << endl;
+        z(r,col) = (rand < __sigm(z(r,col)))?1.0:0.0;
+      }
+    }
 
     for(int u = 0; u < uditer; u++)
     {
@@ -461,22 +472,58 @@ void crbmTrainerTest::testTrain()
       }
     }
 
-    for(int r = 0; r < z.rows(); r++)
-    {
-      for(int col = 0; col < z.cols(); col++)
-      {
-        CPPUNIT_ASSERT_EQUAL(z2(r,col), z(r,col));
-      }
-    }
+    CPPUNIT_ASSERT_EQUAL(ABinary, x);
+    CPPUNIT_ASSERT_EQUAL(z2, z);
 
-    Eb = (ABatch.rowMean() - ABinary.rowMean());
-    Ec = (z1.rowMean()   - z2.rowMean());
-    EW = z1 * ABatch.T() - z2 * ABinary.T();
-    EV = z1 * SBatch.T() - z2 * SBatch.T();
+    // cout << "z1:      " << z1.rows()      << ", " << z1.cols()      << endl;
+    // cout << "z2:      " << z2.rows()      << ", " << z2.cols()      << endl;
+    // cout << "ABinary: " << ABinary.rows() << ", " << ABinary.cols() << endl;
+    // cout << "SBatch:  " << SBatch.rows()  << ", " << SBatch.cols()  << endl;
+    // cout << "ABatch:  " << ABatch.rows()  << ", " << ABatch.cols()  << endl;
+
+    Eb = (ABatch.rowMean() - x.rowMean());
+    Ec = (z1.rowMean()     - z2.rowMean());
+    EW = z1 * ABatch.T()   - z2 * x.T();
+    EV = z1 * SBatch.T()   - z2 * SBatch.T();
     EW /= (double)(bs);
     EV /= (double)(bs);
 
+    Matrix aa = z1 * ABatch.T();
+    Matrix ab = z2 * x.T();
+    Matrix ac = aa - ab;
+    CPPUNIT_ASSERT(aa.L2() > 0.0000001);
+    CPPUNIT_ASSERT(ab.L2() > 0.0000001);
+    CPPUNIT_ASSERT(ac.L2() > 0.0000001);
+    CPPUNIT_ASSERT_EQUAL(ac.rows(), W.rows());
+    CPPUNIT_ASSERT_EQUAL(ac.cols(), W.cols());
+
+    // if(SBatch.sum() > 0.0)
+    {
+      Matrix ba = z1 * SBatch.T();
+      Matrix bb = z2 * SBatch.T();
+      Matrix bc = ba - bb;
+      CPPUNIT_ASSERT(ba.L2() > 0.0000001); // FAIL
+      CPPUNIT_ASSERT(bb.L2() > 0.0000001); // FAIL
+      CPPUNIT_ASSERT(bc.L2() > 0.0000001);
+      CPPUNIT_ASSERT_EQUAL(bc.rows(), V.rows());
+      CPPUNIT_ASSERT_EQUAL(bc.cols(), V.cols());
+      CPPUNIT_ASSERT(EV.L2() > 0.0000001);
+    }
+
+    CPPUNIT_ASSERT(Eb.L2() > 0.0000001);
+    CPPUNIT_ASSERT(Ec.L2() > 0.0000001);
+    CPPUNIT_ASSERT(EW.L2() > 0.0000001);
+
+    CPPUNIT_ASSERT_EQUAL(b.rows(), Eb.rows());
+    CPPUNIT_ASSERT_EQUAL(c.rows(), Ec.rows());
+
+    CPPUNIT_ASSERT_EQUAL(EW.rows(), W.rows());
+    CPPUNIT_ASSERT_EQUAL(EW.cols(), W.cols());
+    CPPUNIT_ASSERT_EQUAL(EV.rows(), V.rows());
+    CPPUNIT_ASSERT_EQUAL(EV.cols(), V.cols());
+
     tmp = alpha * Eb;
+    CPPUNIT_ASSERT(tmp.L2() > 0.0000001);
     crbm->changeb(tmp);
     for(int r = 0; r < bl.rows(); r++)
     {
@@ -485,9 +532,9 @@ void crbmTrainerTest::testTrain()
         bl(r,col) += tmp(r,0);
       }
     }
-    CPPUNIT_ASSERT_EQUAL(bl, crbm->b());
 
     tmp = alpha * Ec;
+    CPPUNIT_ASSERT(tmp.L2() > 0.0000001);
     crbm->changec(tmp);
     for(int r = 0; r < cl.rows(); r++)
     {
@@ -497,17 +544,39 @@ void crbmTrainerTest::testTrain()
       }
     }
 
-    CPPUNIT_ASSERT_EQUAL(cl, crbm->c());
 
     newW = crbm->W() + alpha * EW;
     newV = crbm->V() + alpha * EV;
+
+    Matrix diffW = W - newW;
+    CPPUNIT_ASSERT(diffW.L2() > 0.0000001);
+    Matrix diffV = V - newV;
+    // if(SBatch.sum() > 0.0)
+    {
+      CPPUNIT_ASSERT(diffV.L2() > 0.0000001);
+    }
 
     if(momentum > 0.0)
     {
       tmp = (alpha * momentum) * vb;
       crbm->changeb(tmp);
+      for(int r = 0; r < bl.rows(); r++)
+      {
+        for(int col = 0; col < bl.cols(); col++)
+        {
+          bl(r,col) += tmp(r,0);
+        }
+      }
+
       tmp = (alpha * momentum) * vc;
       crbm->changec(tmp);
+      for(int r = 0; r < cl.rows(); r++)
+      {
+        for(int col = 0; col < cl.cols(); col++)
+        {
+          cl(r,col) += tmp(r,0);
+        }
+      }
       newW = newW + alpha * momentum * vW;
       newV = newV + alpha * momentum * vV;
 
@@ -515,6 +584,8 @@ void crbmTrainerTest::testTrain()
       vc = Ec;
       vW = EW;
       vV = EV;
+
+
     }
 
     if(weightcost > 0.0)
@@ -530,20 +601,10 @@ void crbmTrainerTest::testTrain()
     V  = newV;
     Wt = W.T();
 
-    for(int row = 0; row < W.rows(); row++)
-    {
-      for(int col = 0; col < W.cols(); col++)
-      {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(W(row, col), crbm->W()(row, col), 0.000001);
-      }
-    }
+    CPPUNIT_ASSERT_EQUAL(W, crbm->W());
+    CPPUNIT_ASSERT_EQUAL(V, crbm->V());
 
-    for(int row = 0; row < V.rows(); row++)
-    {
-      for(int col = 0; col < V.cols(); col++)
-      {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(V(row, col), crbm->V()(row, col), 0.000001);
-      }
-    }
+    CPPUNIT_ASSERT_EQUAL(bl, crbm->b());
+    CPPUNIT_ASSERT_EQUAL(cl, crbm->c());
   }
 }
