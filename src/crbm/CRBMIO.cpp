@@ -10,12 +10,12 @@
 
 using namespace std;
 using namespace boost;
-
+using namespace libcrbm;
 
 void CRBMIO::write(string filename, CRBM *crbm)
 {
-  Matrix b(crbm->n(), 1);
-  Matrix c(crbm->m(), 1);
+  CRBMMatrix b(crbm->n(), 1);
+  CRBMMatrix c(crbm->m(), 1);
   for(int i = 0; i < crbm->n(); i++) b(i, 0) = crbm->b(i);
   for(int i = 0; i < crbm->m(); i++) c(i, 0) = crbm->c(i);
   ofstream output;
@@ -62,7 +62,7 @@ CRBM* CRBMIO::read(string filename)
   getline(input, line); // "b:"
   getline(input, line); // "rows x cols:"
 
-  Matrix b(n, 1);
+  CRBMMatrix b(n, 1);
   for(int i = 0; i < n; i++)
   {
     getline(input, line);
@@ -80,7 +80,7 @@ CRBM* CRBMIO::read(string filename)
   getline(input, line); // "c:"
   getline(input, line); // "rows x cols"
 
-  Matrix c(m, 1);
+  CRBMMatrix c(m, 1);
   for(int i = 0; i < m; i++)
   {
     getline(input, line);
@@ -98,7 +98,7 @@ CRBM* CRBMIO::read(string filename)
   getline(input, line); // "W:"
   getline(input, line); // "rows x cols"
 
-  Matrix W(m,n);
+  CRBMMatrix W(m,n);
   for(int i = 0; i < m; i++)
   {
     getline(input, line);
@@ -119,7 +119,7 @@ CRBM* CRBMIO::read(string filename)
   getline(input, line); // "V:"
   getline(input, line); // "rows x cols"
 
-  Matrix V(m,k);
+  CRBMMatrix V(m,k);
   for(int i = 0; i < m; i++)
   {
     getline(input, line);

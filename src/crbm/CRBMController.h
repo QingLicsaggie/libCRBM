@@ -1,7 +1,7 @@
 #ifndef __CRBM_CONTROLLER_H__
 #define __CRBM_CONTROLLER_H__
 
-#include <matrix/Matrix.h>
+#include <crbm/CRBMMatrix.h>
 #include <crbm/Discretiser.h>
 #include <crbm/CRBM.h>
 #include <crbm/CRBMIO.h>
@@ -30,10 +30,10 @@ namespace libcrbm
 
         void update(double* sensors, double* actuators);
 
-        void setW(Matrix& W)       {_crbm->setW(W);};
-        void setV(Matrix& V)       {_crbm->setV(V);};
-        void setb(Matrix& b)       {_crbm->setb(b);};
-        void setc(Matrix& c)       {_crbm->setc(c);};
+        void setW(CRBMMatrix& W)       {_crbm->setW(W);};
+        void setV(CRBMMatrix& V)       {_crbm->setV(V);};
+        void setb(CRBMMatrix& b)       {_crbm->setb(b);};
+        void setc(CRBMMatrix& c)       {_crbm->setc(c);};
         void setCRBM(CRBM* crbm)   {_crbm = crbm;};
         void read(string filename) {_crbm = CRBMIO::read(filename);};
 
@@ -50,8 +50,8 @@ namespace libcrbm
         int     _nrOfHiddenUnits;
         int     _nrOfOutputUnits;
 
-        Matrix  _y;
-        Matrix  _x;
+        CRBMMatrix  _y;
+        CRBMMatrix  _x;
 
         double* _tmpInput;
         double* _tmpOutput;

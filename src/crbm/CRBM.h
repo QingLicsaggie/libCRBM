@@ -1,24 +1,24 @@
 #ifndef __CRBM_H__
 #define __CRBM_H__
 
-#include <matrix/Matrix.h>
+#include <crbm/CRBMMatrix.h>
 
 namespace libcrbm
 {
   namespace binary
   {
-    class CRBM 
+    class CRBM
     {
       public:
 
         CRBM(int k, int n, int m, int uditerations, int bins);
         ~CRBM();
 
-        void learn(Matrix& x, Matrix& y);
-        void control(Matrix& x, Matrix& y);
+        void learn(CRBMMatrix& x, CRBMMatrix& y);
+        void control(CRBMMatrix& x, CRBMMatrix& y);
 
-        void up(Matrix& y, Matrix& x);
-        void down(Matrix& z, Matrix& x);
+        void up(CRBMMatrix& y, CRBMMatrix& x);
+        void down(CRBMMatrix& z, CRBMMatrix& x);
 
         void initRandomWeights(double w = 0.01);
         void initInputBiasValues(double b = 0.01);
@@ -34,22 +34,22 @@ namespace libcrbm
         double b(int i)        {return _b(i,0);};
         double c(int i)        {return _c(i,0);};
 
-        const Matrix& W() {return _W;};
-        const Matrix& V() {return _V;};
-        const Matrix& b() {return _b;};
-        const Matrix& c() {return _c;};
+        const CRBMMatrix& W() {return _W;};
+        const CRBMMatrix& V() {return _V;};
+        const CRBMMatrix& b() {return _b;};
+        const CRBMMatrix& c() {return _c;};
 
-        void changeb(Matrix& db);
-        void changec(Matrix& dc);
+        void changeb(CRBMMatrix& db);
+        void changec(CRBMMatrix& dc);
         void changeb(double alpha);
         void changec(double alpha);
 
-        void setW(Matrix& W);
-        void setV(Matrix& V);
-        void setb(Matrix& b);
-        void setc(Matrix& c);
+        void setW(CRBMMatrix& W);
+        void setV(CRBMMatrix& V);
+        void setb(CRBMMatrix& b);
+        void setc(CRBMMatrix& c);
 
-        const Matrix& z() { return _z; }
+        const CRBMMatrix& z() { return _z; }
         void  initLearning(int n);
 
         int bins() {return _bins;};
@@ -65,13 +65,13 @@ namespace libcrbm
         int    _uditerations; // number of up-down iterations
         int    _bins;
 
-        Matrix _W;            // interaction weights between hidden and outputs
-        Matrix _Wt;           // transposed W
-        Matrix _V;            // interaction weights between hidden and inputs
-        Matrix _b;            // bias values for output
-        Matrix _c;            // bias values for hidden
+        CRBMMatrix _W;            // interaction weights between hidden and outputs
+        CRBMMatrix _Wt;           // transposed W
+        CRBMMatrix _V;            // interaction weights between hidden and inputs
+        CRBMMatrix _b;            // bias values for output
+        CRBMMatrix _c;            // bias values for hidden
 
-        Matrix _z;
+        CRBMMatrix _z;
     };
   }
 }

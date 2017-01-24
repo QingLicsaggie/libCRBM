@@ -5,6 +5,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace libcrbm;
 
 void Random::initialise(bool verbose)
 {

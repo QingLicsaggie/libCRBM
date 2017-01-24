@@ -37,9 +37,9 @@ CRBMController::CRBMController(string filename)
   _unitsPerSenAct = (int)ceil(log2(_bins));
   _nrOfSensors    = _crbm->n() / _unitsPerSenAct;
   _nrOfActuators  = _crbm->k() / _unitsPerSenAct;
-  cout << "Bins: " << _bins << endl;
-  cout << "Nr. of Sensors: " << _nrOfSensors << endl;
-  cout << "Nr. of Actuators: " << _nrOfActuators << endl;
+  // cout << "Bins: " << _bins << endl;
+  // cout << "Nr. of Sensors: " << _nrOfSensors << endl;
+  // cout << "Nr. of Actuators: " << _nrOfActuators << endl;
 
   _d              = new Discretiser(_bins, -1.0, 1.0);
 

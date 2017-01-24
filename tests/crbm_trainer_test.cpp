@@ -18,7 +18,7 @@ using namespace entropy;
 // Registers the fixture into the 'registry'
 CPPUNIT_TEST_SUITE_REGISTRATION( crbmTrainerTest );
 
-void __copy(Matrix& dst, const Matrix& src, int index)
+void __copy(CRBMMatrix& dst, const CRBMMatrix& src, int index)
 {
   for(int r = 0; r < dst.rows(); r++)
   {
@@ -267,17 +267,17 @@ void crbmTrainerTest::testTrain()
 
   CPPUNIT_ASSERT_EQUAL(uditer, crbm->uditerations());
 
-  Matrix W  = crbm->W();
-  Matrix V  = crbm->V();
-  Matrix c  = crbm->c();
-  Matrix Wt = W.T();
+  CRBMMatrix W  = crbm->W();
+  CRBMMatrix V  = crbm->V();
+  CRBMMatrix c  = crbm->c();
+  CRBMMatrix Wt = W.T();
 
-  Matrix vW;
-  Matrix vV;
-  Matrix vb;
-  Matrix vc;
+  CRBMMatrix vW;
+  CRBMMatrix vV;
+  CRBMMatrix vb;
+  CRBMMatrix vc;
 
-  Matrix b(n, 1);
+  CRBMMatrix b(n, 1);
   for(int c = 0; c < n; c++)
   {
     double p = 0.0;
@@ -301,8 +301,8 @@ void crbmTrainerTest::testTrain()
 
   int length = binarisedInput->rows();
 
-  Matrix S(binarisedInput->rows(),  binarisedInput->columns());
-  Matrix A(binarisedOutput->rows(), binarisedOutput->columns());
+  CRBMMatrix S(binarisedInput->rows(),  binarisedInput->columns());
+  CRBMMatrix A(binarisedOutput->rows(), binarisedOutput->columns());
 
   for(int r = 0; r < binarisedInput->rows(); r++)
   {
@@ -320,20 +320,20 @@ void crbmTrainerTest::testTrain()
     }
   }
 
-  Matrix SBatch(S.cols(),  bs);
-  Matrix ABatch(A.cols(),  bs);
-  Matrix ABinary(A.cols(), bs);
+  CRBMMatrix SBatch(S.cols(),  bs);
+  CRBMMatrix ABatch(A.cols(),  bs);
+  CRBMMatrix ABinary(A.cols(), bs);
 
   crbm->initLearning(bs);
 
-  Matrix bl = crbm->b();
-  Matrix cl = crbm->c();
+  CRBMMatrix bl = crbm->b();
+  CRBMMatrix cl = crbm->c();
 
   CPPUNIT_ASSERT_EQUAL(crbm->b(), bl);
   CPPUNIT_ASSERT_EQUAL(crbm->c(), cl);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(c(0,0), 0.0, 0.000001);
 
-  Matrix tmp(0,0);
+  CRBMMatrix tmp(0,0);
 
   vb.resize(n,1);
   vc.resize(m,1);
@@ -343,14 +343,14 @@ void crbmTrainerTest::testTrain()
   for(int i = 0; i < ne; i++)
   {
 
-    Matrix Eb(n,1);
-    Matrix Ec(m,1);
-    Matrix EW(m,n);
-    Matrix EV(m,k);
-    Matrix newb(1,1);
-    Matrix newc(1,1);
-    Matrix newV(1,1);
-    Matrix newW(1,1);
+    CRBMMatrix Eb(n,1);
+    CRBMMatrix Ec(m,1);
+    CRBMMatrix EW(m,n);
+    CRBMMatrix EV(m,k);
+    CRBMMatrix newb(1,1);
+    CRBMMatrix newc(1,1);
+    CRBMMatrix newV(1,1);
+    CRBMMatrix newW(1,1);
 
     int dataStartIndex = i;
     __copy(SBatch, S, dataStartIndex);
@@ -400,10 +400,10 @@ void crbmTrainerTest::testTrain()
 
     Random::initialise(100 + i);
     crbm->up(SBatch, ABatch);
-    Matrix z1 = crbm->z();
+    CRBMMatrix z1 = crbm->z();
 
     // TEST up: crbm->up(SBatch, ABatch);
-    Matrix z = cl + V * SBatch + W * ABatch;
+    CRBMMatrix z = cl + V * SBatch + W * ABatch;
 
     Random::initialise(100 + i);
     for(int r = 0; r < z.rows(); r++)
@@ -418,13 +418,13 @@ void crbmTrainerTest::testTrain()
     }
 
     Random::initialise(200 + i);
-    Matrix x = ABinary;
+    CRBMMatrix x = ABinary;
     crbm->learn(SBatch, ABinary);
-    Matrix z2 = crbm->z();
+    CRBMMatrix z2 = crbm->z();
     CPPUNIT_ASSERT(x != ABinary);
 
     Random::initialise(200 + i);
-    Matrix y = SBatch;
+    CRBMMatrix y = SBatch;
 
     // up
     z = cl + V * y + W * x;
@@ -488,9 +488,9 @@ void crbmTrainerTest::testTrain()
     EW /= (double)(bs);
     EV /= (double)(bs);
 
-    Matrix aa = z1 * ABatch.T();
-    Matrix ab = z2 * x.T();
-    Matrix ac = aa - ab;
+    CRBMMatrix aa = z1 * ABatch.T();
+    CRBMMatrix ab = z2 * x.T();
+    CRBMMatrix ac = aa - ab;
     CPPUNIT_ASSERT(aa.L2() > 0.0000001);
     CPPUNIT_ASSERT(ab.L2() > 0.0000001);
     CPPUNIT_ASSERT(ac.L2() > 0.0000001);
@@ -499,9 +499,9 @@ void crbmTrainerTest::testTrain()
 
     // if(SBatch.sum() > 0.0)
     {
-      Matrix ba = z1 * SBatch.T();
-      Matrix bb = z2 * SBatch.T();
-      Matrix bc = ba - bb;
+      CRBMMatrix ba = z1 * SBatch.T();
+      CRBMMatrix bb = z2 * SBatch.T();
+      CRBMMatrix bc = ba - bb;
       CPPUNIT_ASSERT(ba.L2() > 0.0000001); // FAIL
       CPPUNIT_ASSERT(bb.L2() > 0.0000001); // FAIL
       CPPUNIT_ASSERT(bc.L2() > 0.0000001);
@@ -548,9 +548,9 @@ void crbmTrainerTest::testTrain()
     newW = crbm->W() + alpha * EW;
     newV = crbm->V() + alpha * EV;
 
-    Matrix diffW = W - newW;
+    CRBMMatrix diffW = W - newW;
     CPPUNIT_ASSERT(diffW.L2() > 0.0000001);
-    Matrix diffV = V - newV;
+    CRBMMatrix diffV = V - newV;
     // if(SBatch.sum() > 0.0)
     {
       CPPUNIT_ASSERT(diffV.L2() > 0.0000001);

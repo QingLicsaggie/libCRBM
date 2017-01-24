@@ -118,7 +118,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
 
   // initialise b based on the data
   VLOG(10) << "Constructing b with " << n << " entries";
-  Matrix b(n, 1);
+  CRBMMatrix b(n, 1);
   for(int c = 0; c < n; c++)
   {
     double p = 0.0;
@@ -143,8 +143,8 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   int length = binarisedInput->rows();
 
   VLOG(20) << "Copying binarised data to matrix";
-  Matrix S(binarisedInput->rows(),  binarisedInput->columns());
-  Matrix A(binarisedOutput->rows(), binarisedOutput->columns());
+  CRBMMatrix S(binarisedInput->rows(),  binarisedInput->columns());
+  CRBMMatrix A(binarisedOutput->rows(), binarisedOutput->columns());
 
   for(int r = 0; r < binarisedInput->rows(); r++)
   {
@@ -161,25 +161,25 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
       A(r,c) = binarisedOutput->get(r,c);
     }
   }
-  VLOG(40) << "S Matrix" << endl << S;
-  VLOG(40) << "A Matrix" << endl << A;
+  VLOG(40) << "S CRBMMatrix" << endl << S;
+  VLOG(40) << "A CRBMMatrix" << endl << A;
 
   VLOG(10) << "Batch size: " << _batchsize;
-  Matrix SBatch(S.cols(),  _batchsize);
-  Matrix ABatch(A.cols(),  _batchsize);
-  Matrix X(A.cols(), _batchsize);
+  CRBMMatrix SBatch(S.cols(),  _batchsize);
+  CRBMMatrix ABatch(A.cols(),  _batchsize);
+  CRBMMatrix X(A.cols(), _batchsize);
 
-  Matrix Eb(n,1);
-  Matrix Ec(m,1);
-  Matrix EW(m,n);
-  Matrix EV(m,k);
-  Matrix newb(1,1);
-  Matrix newc(1,1);
-  Matrix newV(1,1);
-  Matrix newW(1,1);
+  CRBMMatrix Eb(n,1);
+  CRBMMatrix Ec(m,1);
+  CRBMMatrix EW(m,n);
+  CRBMMatrix EV(m,k);
+  CRBMMatrix newb(1,1);
+  CRBMMatrix newc(1,1);
+  CRBMMatrix newV(1,1);
+  CRBMMatrix newW(1,1);
 
   _crbm->initLearning(_batchsize);
-  Matrix tmp(0,0);
+  CRBMMatrix tmp(0,0);
 
   _vb.resize(n,1);
   _vc.resize(m,1);
@@ -224,11 +224,11 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
     VLOG(50) << X;
 
     _crbm->up(SBatch, ABatch);
-    Matrix z1 = _crbm->z();
+    CRBMMatrix z1 = _crbm->z();
     VLOG(200) << "Z1:";
     VLOG(200) << z1;
     _crbm->learn(SBatch, X);
-    Matrix z2 = _crbm->z();
+    CRBMMatrix z2 = _crbm->z();
     VLOG(200) << "Z2:";
     VLOG(200) << z2;
     VLOG(30) << "A generated:";
@@ -324,7 +324,7 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   CRBMIO::write(out, _crbm);
 }
 
-void CRBMTrainer::__randomABinary(Matrix& A)
+void CRBMTrainer::__randomABinary(CRBMMatrix& A)
 {
   for(int r = 0; r < A.rows(); r++)
   {
@@ -335,7 +335,7 @@ void CRBMTrainer::__randomABinary(Matrix& A)
   }
 }
 
-void CRBMTrainer::__copy(Matrix& dst, const Matrix& src, int index)
+void CRBMTrainer::__copy(CRBMMatrix& dst, const CRBMMatrix& src, int index)
 {
   for(int r = 0; r < dst.rows(); r++)
   {

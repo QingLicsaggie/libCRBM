@@ -8,7 +8,7 @@
 
 namespace libcrbm
 {
-  class Discretiser 
+  class Discretiser
   {
     public:
       Discretiser(int numberOfBins, double d_min, double d_max);

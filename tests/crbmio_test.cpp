@@ -23,10 +23,10 @@ void crbmioTest::testIO()
 
   CRBM* crbm = new CRBM(k, m, n, 10, 2);
 
-  Matrix W = crbm->W();
-  Matrix V = crbm->V();
-  Matrix b = crbm->b();
-  Matrix c = crbm->c();
+  CRBMMatrix W = crbm->W();
+  CRBMMatrix V = crbm->V();
+  CRBMMatrix b = crbm->b();
+  CRBMMatrix c = crbm->c();
 
   for(int a = 0; a < m; a++)
   {

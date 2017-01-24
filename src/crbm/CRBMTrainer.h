@@ -1,7 +1,7 @@
 #ifndef __CRBM_TRAINER_H__
 #define __CRBM_TRAINER_H__
 
-#include <matrix/Matrix.h>
+#include <crbm/CRBMMatrix.h>
 #include <crbm/CRBM.h>
 
 #include <stdint.h>
@@ -33,8 +33,8 @@ namespace libcrbm
         void setUseProgressBar(bool usePB);
 
       private:
-        void   __copy(Matrix& dst, const Matrix& src, int index);
-        void   __randomABinary(Matrix& a);
+        void   __copy(CRBMMatrix& dst, const CRBMMatrix& src, int index);
+        void   __randomABinary(CRBMMatrix& a);
 
         int    _bins;
         int    _batchsize;     // size of training data batches
@@ -55,10 +55,10 @@ namespace libcrbm
 
         bool   _usePB;
 
-        Matrix _vW;            // for the momentum
-        Matrix _vV;            // for the momentum
-        Matrix _vb;            // for the momentum
-        Matrix _vc;            // for the momentum
+        CRBMMatrix _vW;            // for the momentum
+        CRBMMatrix _vV;            // for the momentum
+        CRBMMatrix _vb;            // for the momentum
+        CRBMMatrix _vc;            // for the momentum
 
         CRBM*  _crbm;
 

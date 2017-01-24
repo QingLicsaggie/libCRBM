@@ -44,7 +44,7 @@ void Discretiser::binarise(uint64_t value, double* values, int n)
       values[i] = 0.0;
     }
   }
-} 
+}
 
 double Discretiser::unbinarise(double* values, int n)
 {

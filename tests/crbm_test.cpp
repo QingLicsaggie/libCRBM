@@ -8,6 +8,7 @@
 #include <math.h>
 
 using namespace std;
+using namespace libcrbm;
 using namespace libcrbm::binary;
 
 // Registers the fixture into the 'registry'
@@ -113,14 +114,14 @@ void crbmTest::testUp()
   crbm->initHiddenBiasValues();
   crbm->initInputBiasValues();
 
-  Matrix y(k,1);
-  Matrix x(n,1);
+  CRBMMatrix y(k,1);
+  CRBMMatrix x(n,1);
   for(int i = 0; i < n; i++)
   {
     x(i,0) = Random::unit();
   }
   crbm->up(y, x);
-  Matrix z = crbm->z();
+  CRBMMatrix z = crbm->z();
   for(int i = 0; i < m; i++)
   {
     CPPUNIT_ASSERT(z(i,0) == 0 || z(i,0) == 1);
@@ -139,8 +140,8 @@ void crbmTest::testDown()
   crbm->initHiddenBiasValues();
   crbm->initInputBiasValues();
 
-  Matrix z = crbm->z();
-  Matrix x(n,1);
+  CRBMMatrix z = crbm->z();
+  CRBMMatrix x(n,1);
   for(int i = 0; i < n; i++)
   {
     x(i,0) = Random::unit();
@@ -161,10 +162,10 @@ void crbmTest::testGetSet()
   int index = 0;
 
   CRBM* crbm = new CRBM(k,m,n,10,2);
-  Matrix W = crbm->W();
-  Matrix V = crbm->V();
-  Matrix b = crbm->b();
-  Matrix c = crbm->c();
+  CRBMMatrix W = crbm->W();
+  CRBMMatrix V = crbm->V();
+  CRBMMatrix b = crbm->b();
+  CRBMMatrix c = crbm->c();
 
   for(int a = 0; a < m; a++)
   {

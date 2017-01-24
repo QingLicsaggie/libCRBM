@@ -30,8 +30,8 @@ CRBM::~CRBM()
 
 void CRBM::initLearning(int n)
 {
-  Matrix ctmp(_c.rows(), n);
-  Matrix btmp(_b.rows(), n);
+  CRBMMatrix ctmp(_c.rows(), n);
+  CRBMMatrix btmp(_b.rows(), n);
 
   for(int r = 0; r < btmp.rows(); r++)
   {
@@ -52,7 +52,7 @@ void CRBM::initLearning(int n)
   _c = ctmp;
 }
 
-void CRBM::learn(Matrix& y, Matrix& x)
+void CRBM::learn(CRBMMatrix& y, CRBMMatrix& x)
 {
   up(y,x);
   for(int i = 0; i < _uditerations; i++)
@@ -62,7 +62,7 @@ void CRBM::learn(Matrix& y, Matrix& x)
   }
 }
 
-void CRBM::control(Matrix& y, Matrix& x)
+void CRBM::control(CRBMMatrix& y, CRBMMatrix& x)
 {
   up(y,x);
   for(int i = 0; i < _uditerations-1; i++)
@@ -73,7 +73,7 @@ void CRBM::control(Matrix& y, Matrix& x)
   down(_z, x);
 }
 
-void CRBM::up(Matrix& y, Matrix& x)
+void CRBM::up(CRBMMatrix& y, CRBMMatrix& x)
 {
   // cout << "up" << endl;
   // cout << "V:" << _V << endl;
@@ -103,7 +103,7 @@ void CRBM::up(Matrix& y, Matrix& x)
   }
 }
 
-void CRBM::down(Matrix& z, Matrix &x)
+void CRBM::down(CRBMMatrix& z, CRBMMatrix &x)
 {
   // cout << "down" << endl;
   // cout << "Wt:" << _Wt << endl;
@@ -173,29 +173,29 @@ double CRBM::__sigm(double v)
   return 1.0 / (1.0 + exp(-v));
 }
 
-void CRBM::setW(Matrix& W)
+void CRBM::setW(CRBMMatrix& W)
 {
   _W  = W;
   _Wt = W;
   _Wt.transpose();
 }
 
-void CRBM::setV(Matrix& V)
+void CRBM::setV(CRBMMatrix& V)
 {
   _V = V;
 }
 
-void CRBM::setb(Matrix& b)
+void CRBM::setb(CRBMMatrix& b)
 {
   _b = b;
 }
 
-void CRBM::setc(Matrix& c)
+void CRBM::setc(CRBMMatrix& c)
 {
   _c = c;
 }
 
-void CRBM::changeb(Matrix& db)
+void CRBM::changeb(CRBMMatrix& db)
 {
   for(int r = 0; r < _b.rows(); r++)
   {
@@ -206,7 +206,7 @@ void CRBM::changeb(Matrix& db)
   }
 }
 
-void CRBM::changec(Matrix& dc)
+void CRBM::changec(CRBMMatrix& dc)
 {
   for(int r = 0; r < _c.rows(); r++)
   {
