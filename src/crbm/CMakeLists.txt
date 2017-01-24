@@ -18,7 +18,7 @@ else(APPLE)
   add_library(CRBM STATIC ${SRC})
 endif(APPLE)
 
-target_link_libraries(CRBM ${Boost_LIBRARIES} m Entropy++ glog ncurses)
+target_link_libraries(CRBM m Entropy++ glog ${Boost_LIBRARIES})
 
 add_executable(train main_train.cpp)
 target_link_libraries(train CRBM gflags)
