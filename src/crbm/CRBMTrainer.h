@@ -25,11 +25,12 @@ namespace libcrbm
                     double alpha,
                     double momentum,
                     double weightcost,
-                    double perturbation);
+                    double perturbation,
+                    string init = "");
 
         ~CRBMTrainer();
 
-        void train(string inputFilename, string outputFilename, string out, int m);
+        void train(string inputFilename, string outputFilename, string out, int m = 0);
         void setUseProgressBar(bool usePB);
 
       private:

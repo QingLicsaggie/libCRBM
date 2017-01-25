@@ -49,6 +49,7 @@ CRBMController::CRBMController(string filename)
   _y.resize(_nrOfSensors   * _unitsPerSenAct, 1);
   _x.resize(_nrOfActuators * _unitsPerSenAct, 1);
 
+  Random::initialise();
 }
 
 CRBMController::~CRBMController()
@@ -66,11 +67,18 @@ void CRBMController::update(double* sensors, double* actuators)
     _d->double2doublearray(sensors[i], _tmpInput);
     for(int j = 0; j < _unitsPerSenAct; j++)
     {
-      _y(index++,0) = _tmpInput[j];
+      _y(index,0) = _tmpInput[j];
+      index++;
     }
   }
 
-  // cout << _y << endl;
+  for(int i = 0; i < _x.rows(); i++)
+  {
+    for(int j = 0; j < _x.cols(); j++)
+    {
+      _x(i,j) = (Random::unit() < 0.5)?1:0;
+    }
+  }
 
   _crbm->control(_y, _x);
 
@@ -79,8 +87,15 @@ void CRBMController::update(double* sensors, double* actuators)
   {
     for(int j = 0; j < _unitsPerSenAct; j++)
     {
-      _tmpOutput[j] = _x(index++,0);
+      _tmpOutput[j] = _x(index,0);
+      index++;
     }
     actuators[i] = _d->doublearray2double(_tmpOutput);
   }
 }
+
+CRBM* CRBMController::crbm()
+{
+  return _crbm;
+}
+

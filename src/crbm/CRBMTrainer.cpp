@@ -19,7 +19,8 @@ CRBMTrainer::CRBMTrainer(int    bins,
                          double alpha,
                          double momentum,
                          double weightcost,
-                         double perturbation)
+                         double perturbation,
+                         string init)
 {
   _bins          = bins;
   _uditerations  = uditerations;
@@ -31,7 +32,11 @@ CRBMTrainer::CRBMTrainer(int    bins,
   _perturbation  = perturbation;
   _unitPerSenAct = (int)ceil(log2(_bins));
   _usePB         = true;
+
   Random::initialise();
+
+  if(init == "") _crbm = NULL;
+  else           _crbm = CRBMIO::read(init);
 }
 
 CRBMTrainer::~CRBMTrainer()
@@ -51,6 +56,9 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
   entropy::DContainer* output = entropy::Csv::read(outputFilename);
   VLOG(20) << "Actuators: " << endl << *output;
   if(VLOG_IS_ON(30)) entropy::Csv::write("a.csv", output);
+
+  input  = input->drop(-1);
+  output = output->drop(1);
 
   input->setBinSizes(_bins);
   input->setDomains(-1.0, 1.0);
@@ -113,8 +121,11 @@ void CRBMTrainer::train(string inputFilename, string outputFilename, string out,
 
   VLOG(10) << "Creating CRBM with " << n << ", " << m << ", " << k;
 
-  _crbm = new CRBM(n, m, k, _uditerations, _bins);
-  _crbm->initRandomWeights(0.01);
+  if(_crbm == NULL)
+  {
+    _crbm = new CRBM(n, m, k, _uditerations, _bins);
+    _crbm->initRandomWeights(0.01);
+  }
 
   // initialise b based on the data
   VLOG(10) << "Constructing b with " << n << " entries";

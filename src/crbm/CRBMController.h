@@ -35,6 +35,7 @@ namespace libcrbm
         void setb(CRBMMatrix& b)       {_crbm->setb(b);};
         void setc(CRBMMatrix& c)       {_crbm->setc(c);};
         void setCRBM(CRBM* crbm)   {_crbm = crbm;};
+        CRBM* crbm();
         void read(string filename) {_crbm = CRBMIO::read(filename);};
 
         //CRBMController(const CRBMController);

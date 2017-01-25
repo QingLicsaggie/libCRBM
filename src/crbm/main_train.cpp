@@ -10,6 +10,8 @@ DEFINE_string(S,  "",    "sensor file (CSV)");
 DEFINE_string(A,  "",    "actuator file (CSV)");
 DEFINE_string(o,  "",    "output filename");
 
+DEFINE_string(i,  "",    "output filename");
+
 DEFINE_int64(b,   16,    "bins");
 DEFINE_int64(m,   16,    "nr. of hidden units");
 DEFINE_int64(ud,  10,    "up-down iterations");
@@ -55,7 +57,8 @@ int main(int argc, char** argv)
                                          FLAGS_a,
                                          FLAGS_mo,
                                          FLAGS_wc,
-                                         FLAGS_p);
+                                         FLAGS_p,
+                                         FLAGS_i);
 
   trainer->setUseProgressBar(FLAGS_pb);
   trainer->train(FLAGS_S, FLAGS_A, FLAGS_o, FLAGS_m);
